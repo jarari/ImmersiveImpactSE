@@ -54,8 +54,8 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 		}
 		++it;
 	}
-	int weptype_r = 0;
-	int weptype_l = 0;
+	int weptype_r = iWepType::None;
+	int weptype_l = iWepType::None;
 	if (a->GetEquippedObject(false)) {
 		TESObjectWEAP* wep = ((TESObjectWEAP*)a->GetEquippedObject(false));
 		int weptype = wep->type();
