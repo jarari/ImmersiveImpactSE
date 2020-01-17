@@ -1,4 +1,5 @@
 #pragma once
+#include <skse64\GameCamera.h>
 #include <skse64\GameEvents.h>
 #include <skse64\GameTypes.h>
 template <typename EventT, typename EventArgT = EventT>
