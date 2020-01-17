@@ -62,7 +62,6 @@ extern "C" {
 			if (msg->type == SKSEMessagingInterface::kMessage_PreLoadGame || msg->type == SKSEMessagingInterface::kMessage_NewGame) {
 				HitEventPool::ResetPool();
 				StaggerPool::ResetPool();
-				HitEventWatcher::GetInstance()->HookEvent();
 				ConfigManager::GetInstance()->LoadConfigs();
 			}
 			else if (msg->type == SKSEMessagingInterface::kMessage_DataLoaded) {
