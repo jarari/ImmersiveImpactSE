@@ -42,9 +42,9 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 	int weptype = Utils::GetWeaponType(wep);
 
 	if (ConfigManager::GetConfig()[iConfigType::EnableHitStop].value) {
-		if ((evn->target && evn->caster == pc && evn->target != pc) ||
+		if ((evn->target && evn->target->formType == kFormType_Character && evn->caster == pc && evn->target != pc) ||
 			(evn->target && evn->target == pc && ConfigManager::GetConfig()[iConfigType::HitStop_OnPlayerHit].value) ||
-			(!evn->target && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitStop_OnObjectHit].value)) {
+			((evn->target && evn->target->formType != kFormType_Character || !evn->target) && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitStop_OnObjectHit].value)) {
 			thread* t;
 			switch (weptype) {
 				case iWepType::Fist:
@@ -81,9 +81,9 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 	}
 
 	if (ConfigManager::GetConfig()[iConfigType::EnableHitShakeController].value) {
-		if ((evn->target && evn->caster == pc && evn->target != pc) ||
+		if ((evn->target && evn->target->formType == kFormType_Character && evn->caster == pc && evn->target != pc) ||
 			(evn->target && evn->target == pc && ConfigManager::GetConfig()[iConfigType::HitShakeController_OnPlayerHit].value) ||
-			(!evn->target && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitShakeController_OnObjectHit].value)) {
+			((evn->target && evn->target->formType != kFormType_Character || !evn->target) && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitShakeController_OnObjectHit].value)) {
 			float mag;
 			switch (weptype) {
 				case iWepType::Fist:
@@ -104,9 +104,9 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 	}
 
 	if (ConfigManager::GetConfig()[iConfigType::EnableHitShakeCam].value) {
-		if ((evn->target && evn->caster == pc && evn->target != pc)  ||
+		if ((evn->target && evn->target->formType == kFormType_Character && evn->caster == pc && evn->target != pc) ||
 			(evn->target && evn->target == pc && ConfigManager::GetConfig()[iConfigType::HitShakeCam_OnPlayerHit].value) ||
-			(!evn->target && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitShakeCam_OnObjectHit].value)) {
+			((evn->target && evn->target->formType != kFormType_Character || !evn->target) && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitShakeCam_OnObjectHit].value)) {
 			VMClassRegistry* registry = (*g_skyrimVM)->GetClassRegistry();
 			if (registry) {
 				float mag;
@@ -130,9 +130,9 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 	}
 
 	if (ConfigManager::GetConfig()[iConfigType::EnableHitBlur].value) {
-		if ((evn->target && evn->caster == pc && evn->target != pc) ||
+		if ((evn->target && evn->target->formType == kFormType_Character && evn->caster == pc && evn->target != pc) ||
 			(evn->target && evn->target == pc && ConfigManager::GetConfig()[iConfigType::HitBlur_OnPlayerHit].value) ||
-			(!evn->target && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitBlur_OnObjectHit].value)) {
+			((evn->target && evn->target->formType != kFormType_Character || !evn->target) && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitBlur_OnObjectHit].value)) {
 			float mag;
 			switch (weptype) {
 				case iWepType::Fist:
