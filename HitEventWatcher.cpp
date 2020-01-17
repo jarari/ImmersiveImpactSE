@@ -16,18 +16,12 @@
 
 std::string HitEventWatcher::className = "HitEventWatcher";
 HitEventWatcher* HitEventWatcher::instance = nullptr;
-bool HitEventWatcher::enabled = false;
 std::random_device rd;
 
 void HookDamageCalculation() {
 	struct InstallHookDamageCalculation_Code : Xbyak::CodeGenerator {
 		InstallHookDamageCalculation_Code(void* buf, uintptr_t processTask) : Xbyak::CodeGenerator(4096, buf) {
 			Xbyak::Label retn;
-			push(rax);
-			mov(eax, ptr[(uintptr_t)& HitEventWatcher::enabled]);
-			cmp(eax, 0);
-			pop(rax);
-			je(retn);
 			test(rdi, rdi);
 			je(retn);
 			cmp(rdi, rbx);
