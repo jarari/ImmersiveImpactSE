@@ -27,9 +27,6 @@
     <ClCompile Include="Utils.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ActiveEffectWatcher.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="ObjectLoadWatcher.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -68,9 +65,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Utils.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ActiveEffectWatcher.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="HitEventWatcher.h">

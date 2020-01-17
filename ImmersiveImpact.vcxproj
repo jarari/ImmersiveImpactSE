@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ActiveEffectWatcher.cpp" />
     <ClCompile Include="ActorManager.cpp" />
     <ClCompile Include="AddressManager.cpp" />
     <ClCompile Include="AnimEventWatcher.cpp" />
@@ -48,7 +47,6 @@
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ActiveEffectWatcher.h" />
     <ClInclude Include="ActorManager.h" />
     <ClInclude Include="AddressManager.h" />
     <ClInclude Include="AnimEventWatcher.h" />
