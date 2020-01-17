@@ -161,7 +161,8 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 	std::uniform_int_distribution<int> dist{ 0, 99 };
 	float chance = dist(e);
 	if (chance < deflectChance) {
-		NiPoint3 dpos = (attacker->pos - target->pos);
+		PlayerCameraEx* pcam = (PlayerCameraEx*)PlayerCamera::GetSingleton();
+		NiPoint3 dpos = (NiPoint3(pcam->posX, pcam->posY, pcam->posZ) - target->pos);
 		float dist = sqrt(dpos.x * dpos.x + dpos.y * dpos.y + dpos.z * dpos.z);
 		float vol = min(max(500.0f - dist, 0.0f) / 100.0f, 1.0f);
 		ActorManager::deflectAttack(target, ae, isArrow, true, vol);

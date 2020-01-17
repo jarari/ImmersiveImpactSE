@@ -104,3 +104,67 @@ public:
 
 	//	void	** _vtbl;
 };
+
+class TESCameraEx {
+public:
+	TESCameraEx();
+	virtual ~TESCameraEx();
+
+	virtual void SetNode(NiNode* node);
+	virtual void Update();
+
+	float		rotZ;	// 08
+	float		rotX;	// 0C
+	NiPoint3	pos;	// 10
+	float		zoom;	// 1C
+	NiNode* cameraNode;	// 20 - First child is usually NiCamera
+	TESCameraState* cameraState;	// 28
+	UInt8		unk30;			// 30
+	UInt8		pad31[7];		// 31
+};
+
+class PlayerCameraEx : public TESCameraEx {
+public:
+	PlayerCameraEx();
+	virtual ~PlayerCameraEx();
+
+	enum {
+		kCameraState_FirstPerson = 0,
+		kCameraState_AutoVanity,
+		kCameraState_VATS,
+		kCameraState_Free,
+		kCameraState_IronSights,
+		kCameraState_Furniture,
+		kCameraState_Transition,
+		kCameraState_TweenMenu,
+		kCameraState_ThirdPerson1,
+		kCameraState_ThirdPerson2,
+		kCameraState_Horse,
+		kCameraState_Bleedout,
+		kCameraState_Dragon,
+		kNumCameraStates
+	};
+
+	UInt8	unk38[0xB8 - 0x38];							// 028
+	TESCameraState* cameraStates[kNumCameraStates];	// 0B8
+	UInt64	unk120;										// 120
+	UInt64	unk128;										// 128
+	UInt64	unk130;										// 130
+	UInt32	unk138;										// 138
+	float	worldFOV;									// 13C
+	float	firstPersonFOV;								// 140
+	float	posX;										// 144
+	float	posY;										// 148
+	float	posZ;										// 14C
+	UInt8	unk150[0x160 - 0x150];						// 150
+	UInt8	unk160;										// 160
+	UInt8	unk161;										// 161
+	UInt8	unk162;										// 162 - init'd to 1
+	UInt8	unk163;										// 163
+	UInt8	unk164;										// 164
+	UInt8	unk165;										// 165
+	UInt8	pad166[2];									// 166
+
+	MEMBER_FN_PREFIX(PlayerCamera);
+	DEFINE_MEMBER_FN(UpdateThirdPerson, void, 0x0084D630, bool weaponDrawn);
+};
