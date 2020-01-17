@@ -30,4 +30,8 @@ public:
 
 	static void InitWatcher();
 
+	static void RemoveWatcher() {
+		GetEventDispatcherList()->objectLoadedDispatcher.RemoveEventSink(instance);
+	}
+
 };

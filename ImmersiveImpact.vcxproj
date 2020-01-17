@@ -25,6 +25,7 @@
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="HitEventTask.cpp" />
     <ClCompile Include="HitEventWatcher.cpp" />
+    <ClCompile Include="HitStopManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MenuWatcher.cpp" />
     <ClCompile Include="ObjectLoadWatcher.cpp" />
@@ -53,6 +54,8 @@
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="HitEventTask.h" />
     <ClInclude Include="HitEventWatcher.h" />
+    <ClInclude Include="HitStopManager.h" />
+    <ClInclude Include="HitStopThread.h" />
     <ClInclude Include="INILibrary\SimpleIni.h" />
     <ClInclude Include="MenuWatcher.h" />
     <ClInclude Include="ModifiedSKSE.h" />

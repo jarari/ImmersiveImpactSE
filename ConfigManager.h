@@ -48,7 +48,35 @@ enum iConfigType {
 	StaggerDamageMax,
 	StaggerAny,
 	EnableDash,
-	StaggerArmorCap
+	StaggerArmorCap,
+	EnableHitStop,
+	HitStop_OnPlayerHit,
+	HitStop_OnObjectHit,
+	HitStop_Fist,
+	HitStop_Dagger,
+	HitStop_1H,
+	HitStop_2H,
+	EnableHitShakeController,
+	HitShakeController_OnPlayerHit,
+	HitShakeController_OnObjectHit,
+	HitShakeController_Fist,
+	HitShakeController_Dagger,
+	HitShakeController_1H,
+	HitShakeController_2H,
+	EnableHitShakeCam,
+	HitShakeCam_OnPlayerHit,
+	HitShakeCam_OnObjectHit,
+	HitShakeCam_Fist,
+	HitShakeCam_Dagger,
+	HitShakeCam_1H,
+	HitShakeCam_2H,
+	EnableHitBlur,
+	HitBlur_OnPlayerHit,
+	HitBlur_OnObjectHit,
+	HitBlur_Fist,
+	HitBlur_Dagger,
+	HitBlur_1H,
+	HitBlur_2H
 };
 
 class ConfigManager {
@@ -77,4 +105,6 @@ public:
 	void InitializeINI();
 
 	void LoadConfigs();
+
+	void UpdateINIWithCurrentValues();
 };

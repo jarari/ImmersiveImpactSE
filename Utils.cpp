@@ -1,5 +1,6 @@
 #include "AddressManager.h"
 #include "Utils.h"
+#include "WeaponSpeedManager.h"
 #include <skse64\GameReferences.h>
 #include <skse64\PapyrusVM.h>
 #include <sstream>
@@ -99,4 +100,23 @@ void Utils::SetInstanceVolume(UInt32 instance, float volume) {
 	VMClassRegistry* registry = (*g_skyrimVM)->GetClassRegistry();
 	if (!registry) return;
 	SetInstanceVolume_Native(registry, 0, instance, volume);
+}
+
+int Utils::GetWeaponType(TESObjectWEAP* wep) {
+	if(!wep)
+		return iWepType::None;
+	int weptype = wep->type();
+	if (weptype == 5 || weptype == 6) {
+		return iWepType::TwoH;
+	}
+	else if (weptype == 1 || weptype == 3 || weptype == 4) {
+		return iWepType::OneH;
+	}
+	else if (weptype == 2) {
+		return iWepType::Dagger;
+	}
+	else if (weptype == 0) {
+		return iWepType::Fist;
+	}
+	return iWepType::None;
 }

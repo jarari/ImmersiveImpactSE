@@ -20,10 +20,6 @@ public:
 
 	void HookSink();
 
-	void RemoveHook();
-
-	static void ResetHook();
-
 protected:
 	static std::string className;
 	static unordered_map<UInt64, FnReceiveEvent> fnHash;

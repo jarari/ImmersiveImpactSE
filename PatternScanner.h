@@ -19,9 +19,9 @@ public:
 	size_t size = -1;
 };
 
-bool CompareBytes(BYTE* data, vector<BYTE> pattern, bool useMask, BYTE* mask) {
+bool CompareBytes(BYTE* data, vector<BYTE> pattern, bool useMask, BYTE mask) {
 	for (vector<BYTE>::iterator it = pattern.begin(); it != pattern.end(); *data++, it++) {
-		if (*it == *mask && useMask)
+		if (*it == mask && useMask)
 			continue;
 		if (*data != *it)
 			return false;
@@ -37,7 +37,7 @@ namespace PatternScanner {
 		mr->Set((uintptr_t)handle, mi.SizeOfImage);
 	}
 
-	uintptr_t PatternScanInternal(MemoryRegion* r, vector<BYTE> pattern, bool useMask = false, BYTE* mask = '\x00') {
+	uintptr_t PatternScanInternal(MemoryRegion* r, vector<BYTE> pattern, bool useMask = false, BYTE mask = '\x00') {
 		size_t len = pattern.size();
 		BYTE* end = (BYTE*)r->base + r->size - len;
 		for (BYTE* addr = (BYTE*)r->base; addr < end; addr++) {

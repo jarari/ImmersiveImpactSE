@@ -54,46 +54,8 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 		}
 		++it;
 	}
-	int weptype_r = iWepType::None;
-	int weptype_l = iWepType::None;
-	if (a->GetEquippedObject(false)) {
-		TESObjectWEAP* wep = ((TESObjectWEAP*)a->GetEquippedObject(false));
-		int weptype = wep->type();
-		if (weptype == 5 || weptype == 6) {
-			weptype_r = iWepType::TwoH;
-		}
-		else if (weptype == 1 || weptype == 3 || weptype == 4) {
-			weptype_r = iWepType::OneH;
-		}
-		else if (weptype == 2) {
-			weptype_r = iWepType::Dagger;
-		}
-		else if (weptype == 0) {
-			weptype_r = iWepType::Fist;
-		}
-		else {
-			weptype_r = iWepType::None;
-		}
-	}
-	if (a->GetEquippedObject(true)) {
-		TESObjectWEAP* wep = ((TESObjectWEAP*)a->GetEquippedObject(true));
-		int weptype = wep->type();
-		if (weptype == 5 || weptype == 6) {
-			weptype_l = iWepType::TwoH;
-		}
-		else if (weptype == 1 || weptype == 3 || weptype == 4) {
-			weptype_l = iWepType::OneH;
-		}
-		else if (weptype == 2) {
-			weptype_l = iWepType::Dagger;
-		}
-		else if (weptype == 0) {
-			weptype_l = iWepType::Fist;
-		}
-		else {
-			weptype_l = iWepType::None;
-		}
-	}
+	int weptype_r = Utils::GetWeaponType(((TESObjectWEAP*)a->GetEquippedObject(false)));
+	int weptype_l = Utils::GetWeaponType(((TESObjectWEAP*)a->GetEquippedObject(true)));
 
 	float speed_r = 1;
 	float speed_l = 1;

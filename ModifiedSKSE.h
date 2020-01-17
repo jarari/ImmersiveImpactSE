@@ -165,7 +165,12 @@ public:
 	UInt8	unk164;										// 164
 	UInt8	unk165;										// 165
 	UInt8	pad166[2];									// 166
+};
 
-	MEMBER_FN_PREFIX(PlayerCamera);
-	DEFINE_MEMBER_FN(UpdateThirdPerson, void, 0x0084D630, bool weaponDrawn);
+class UIBlurManager {
+	UIBlurManager();
+	virtual ~UIBlurManager();
+
+	void* unk08;
+	TESImageSpaceModifier* modifier;
 };

@@ -54,6 +54,9 @@
     <ClCompile Include="MenuWatcher.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="HitStopManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
@@ -101,6 +104,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="MenuWatcher.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HitStopThread.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HitStopManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

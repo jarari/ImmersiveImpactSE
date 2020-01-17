@@ -3,6 +3,7 @@
 #include "ConfigManager.h"
 #include "HitEventTask.h"
 #include "HitEventWatcher.h"
+#include "HitStopManager.h"
 #include "Utils.h"
 #include <skse64_common\BranchTrampoline.h>
 #include <skse64_common\SafeWrite.h>
@@ -79,6 +80,7 @@ void HitEventWatcher::InitWatcher() {
 }
 
 EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESHitEvent>* src) {
+	HitStopManager::EvaluateEvent(evn);
 	if (!evn->target || evn->target->formType != kFormType_Character || !evn->caster || evn->caster->formType != kFormType_Character)
 		return kEvent_Continue;
 	Character* target = (Character*)evn->target;
@@ -105,13 +107,13 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 
 	ae->duration = ae->elapsed;
 
-	bool blocked = (evn->flags & TESHitEvent::kFlag_Blocked) == TESHitEvent::kFlag_Blocked;
-	bool powerattack = (evn->flags & TESHitEvent::kFlag_PowerAttack) == TESHitEvent::kFlag_PowerAttack;
-	bool bash = (evn->flags & TESHitEvent::kFlag_Bash) == TESHitEvent::kFlag_Bash;
+	bool blocked = evn->flags == TESHitEvent::kFlag_Blocked;
+	bool powerattack = evn->flags == TESHitEvent::kFlag_PowerAttack;
+	bool bash = evn->flags == TESHitEvent::kFlag_Bash;
 
 	//Dump(evn, 256);
 	TESObjectWEAP* wep = (TESObjectWEAP*)LookupFormByID(evn->sourceFormID);
-	if (wep == nullptr || wep->formType != kFormType_Weapon)
+	if (!wep || wep->formType != kFormType_Weapon)
 		return kEvent_Continue;
 
 	bool isArrow = false;
@@ -166,7 +168,7 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 		float dist = sqrt(dpos.x * dpos.x + dpos.y * dpos.y + dpos.z * dpos.z);
 		float vol = min(max(500.0f - dist, 0.0f) / 100.0f, 1.0f);
 		ActorManager::deflectAttack(target, ae, isArrow, true, vol);
-		blocked = true;
+		evn->flags = TESHitEvent::kFlag_Blocked;
 		if (attacker == *g_thePlayer) {
 			char buff[64];
 			/*TESFullName* pFullName = DYNAMIC_CAST(target->baseForm, TESForm, TESFullName);

@@ -5,6 +5,7 @@ class ActiveEffect;
 class NiPoint3;
 class NiMatrix33;
 class TESObjectREFR;
+class TESObjectWEAP;
 class TESSound;
 
 namespace Utils{
@@ -26,4 +27,5 @@ namespace Utils{
 	void SendNotification(const char* str);
 	UInt32 SoundPlay(TESSound* sound, TESObjectREFR* obj);
 	void SetInstanceVolume(UInt32 instance, float volume);
+	int GetWeaponType(TESObjectWEAP* wep);
 }

@@ -4,12 +4,14 @@
 #include "ConfigManager.h"
 #include "HitEventWatcher.h"
 #include "HitEventTask.h"
+#include "HitStopManager.h"
 #include "MenuWatcher.h"
 #include "ObjectLoadWatcher.h"
 #include "StaggerTask.h"
 #include <common\IDebugLog.h>
 #include <skse64_common\BranchTrampoline.h>
 #include <skse64_common\skse_version.h>
+#include <skse64\GameRTTI.h>
 #include <skse64\PluginAPI.h>
 #include <ShlObj.h>
 
@@ -54,27 +56,29 @@ extern "C" {
 	}
 
 	bool SKSEPlugin_Load(const SKSEInterface* skse) {
+		ConfigManager* cm = new ConfigManager();
 		g_message = (SKSEMessagingInterface*) skse->QueryInterface(kInterface_Messaging);
 		g_message->RegisterListener(skse->GetPluginHandle(), "SKSE", [](SKSEMessagingInterface::Message* msg) -> void {
 			if (msg->type == SKSEMessagingInterface::kMessage_PreLoadGame || msg->type == SKSEMessagingInterface::kMessage_NewGame) {
-				_MESSAGE("Player : %llx", *g_thePlayer);
 				HitEventPool::ResetPool();
 				StaggerPool::ResetPool();
 				HitEventWatcher::GetInstance()->HookEvent();
-				ConfigManager* cm = new ConfigManager();
-				cm->LoadConfigs();
-				ObjectLoadWatcher::InitWatcher();
-				AnimEventWatcher::ResetHook();
-				AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&(*g_thePlayer)->animGraphEventSink);
-				ae->HookSink();
+				ConfigManager::GetInstance()->LoadConfigs();
 			}
 			else if (msg->type == SKSEMessagingInterface::kMessage_DataLoaded) {
 				AddressManager* am = new AddressManager();
 				am->FindAddresses();
+				ActorManager::FindDeflectSound();
+				HitStopManager::FindBlurEffect();
 				StaggerHelper::Register();
 				MenuWatcher::InitWatcher();
 				HitEventWatcher::InitWatcher();
-				ActorManager::FindDeflectSound();
+				ObjectLoadWatcher::InitWatcher();
+				AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&(*g_thePlayer)->animGraphEventSink);
+				ae->HookSink();
+				ConfigManager::GetInstance()->LoadConfigs();
+				ConfigManager::GetInstance()->UpdateINIWithCurrentValues();
+				_MESSAGE("Player : %llx", *g_thePlayer);
 			}
 		});
 		return true;

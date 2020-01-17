@@ -44,11 +44,38 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("StaggerDamageMax", 100.0f));
 	configs.push_back(Config("StaggerAny", 0));
 	configs.push_back(Config("EnableDash", 0));
-	configs.push_back(Config("StaggerArmorCap", 300.0f));
+	configs.push_back(Config("EnableHitStop", 1));
+	configs.push_back(Config("HitStop_OnPlayerHit", 1));
+	configs.push_back(Config("HitStop_OnObjectHit", 1));
+	configs.push_back(Config("HitStop_Fist", 0.075f));
+	configs.push_back(Config("HitStop_Dagger", 0.05f));
+	configs.push_back(Config("HitStop_1H", 0.075f));
+	configs.push_back(Config("HitStop_2H", 0.1f));
+	configs.push_back(Config("EnableHitShakeController", 1));
+	configs.push_back(Config("HitShakeController_OnPlayerHit", 1));
+	configs.push_back(Config("HitShakeController_OnObjectHit", 1));
+	configs.push_back(Config("HitShakeController_Fist", 0.3f));
+	configs.push_back(Config("HitShakeController_Dagger", 0.2f));
+	configs.push_back(Config("HitShakeController_1H", 0.4f));
+	configs.push_back(Config("HitShakeController_2H", 0.5f));
+	configs.push_back(Config("EnableHitShakeCam", 1));
+	configs.push_back(Config("HitShakeCam_OnPlayerHit", 1));
+	configs.push_back(Config("HitShakeCam_OnObjectHit", 1));
+	configs.push_back(Config("HitShakeCam_Fist", 0.3f));
+	configs.push_back(Config("HitShakeCam_Dagger", 0.2f));
+	configs.push_back(Config("HitShakeCam_1H", 0.4f));
+	configs.push_back(Config("HitShakeCam_2H", 0.5f));
+	configs.push_back(Config("EnableHitBlur", 1));
+	configs.push_back(Config("HitBlur_OnPlayerHit", 1));
+	configs.push_back(Config("HitBlur_OnObjectHit", 1));
+	configs.push_back(Config("HitBlur_Fist", 0.3f));
+	configs.push_back(Config("HitBlur_Dagger", 0.2f));
+	configs.push_back(Config("HitBlur_1H", 0.4f));
+	configs.push_back(Config("HitBlur_2H", 0.5f));
 }
 
 void ConfigManager::InitializeINI() {
-	char f2c[16];
+	char f2c[64];
 	for (int i = 0; i < configs.size(); i++) {
 		sprintf_s(f2c, "%f", configs[i].value);
 		ini.SetValue("General", configs[i].name, f2c);
@@ -73,7 +100,7 @@ void ConfigManager::LoadConfigs() {
 		return;
 	}
 
-	char f2c[16];
+	char f2c[64];
 	for (int i = 0; i < configs.size(); i++) {
 		sprintf_s(f2c, "%f", configs[i].value);
 		configs[i].value = std::stof(ini.GetValue("General", configs[i].name, f2c, NULL));
@@ -82,4 +109,13 @@ void ConfigManager::LoadConfigs() {
 	if (!configs[iConfigType::EnableHitFeedback].value) {
 		HitEventWatcher::GetInstance()->RemoveHook();
 	}
+}
+
+void ConfigManager::UpdateINIWithCurrentValues() {
+	char f2c[64];
+	for (int i = 0; i < configs.size(); i++) {
+		sprintf_s(f2c, "%f", configs[i].value);
+		ini.SetValue("General", configs[i].name, f2c);
+	}
+	ini.SaveFile(filepath, false);
 }
