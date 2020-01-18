@@ -48,8 +48,6 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 		//Instead of looking for specific for ids, look for what actorvalue does this ActiveEffect change.
 		if (ae->actorValue == ActorManager::GetActorValuePointerFromMap("WeaponSpeedMult")) {
 			offset_r->magnitude += ae->magnitude - 1;
-		}
-		else if (ae->actorValue == ActorManager::GetActorValuePointerFromMap("LeftWeaponSpeedMult")) {
 			offset_l->magnitude += ae->magnitude - 1;
 		}
 		++it;
