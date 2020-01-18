@@ -11,6 +11,33 @@
 #include <thread>
 using std::thread;
 
+void HitStopThreadFunc(int duration, int sync) {
+	std::this_thread::sleep_for(std::chrono::milliseconds(sync)); //Hit frame sync
+
+	PlayerCameraEx* pCam = (PlayerCameraEx*)PlayerCamera::GetSingleton();
+	float oldFov = pCam->worldFOV;
+	float oldFPFov = pCam->firstPersonFOV;
+	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))++;
+	int slept = 0;
+	int sleepPerCall = duration / 15;
+	float fovStep = ConfigManager::GetConfig()[iConfigType::HitStop_FovStep].value;
+	while (slept < duration) {
+		if (slept < duration / 2) {
+			pCam->worldFOV -= fovStep;
+			pCam->firstPersonFOV -= fovStep;
+		}
+		else {
+			pCam->worldFOV += fovStep;
+			pCam->firstPersonFOV += fovStep;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleepPerCall));
+		slept += sleepPerCall;
+	}
+	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))--;
+	pCam->worldFOV = oldFov;
+	pCam->firstPersonFOV = oldFPFov;
+}
+
 void HitStopManager::FindBlurEffect() {
 	DataHandler* dh = DataHandler::GetSingleton();
 	const ModInfo* iimpt = dh->LookupModByName("ImmersiveImpact.esp");
@@ -46,34 +73,23 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 			(evn->target && evn->target == pc && ConfigManager::GetConfig()[iConfigType::HitStop_OnPlayerHit].value) ||
 			((evn->target && evn->target->formType != kFormType_Character || !evn->target) && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitStop_OnObjectHit].value)) {
 			thread* t;
+			void (*threadFunc)(int, int) = HitStopThreadFunc;
 			switch (weptype) {
 				case iWepType::Fist:
-					t = new thread([](thread* t)-> void {
-						(*(UInt32*)(ptr_UnknownDataHolder + 0x160))++;
-						std::this_thread::sleep_for(std::chrono::milliseconds((int)floor(ConfigManager::GetConfig()[iConfigType::HitStop_Fist].value * 1000)));
-						(*(UInt32*)(ptr_UnknownDataHolder + 0x160))--;
-					}, t);
+					t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_Fist].value * 1000),
+								   floor(ConfigManager::GetConfig()[iConfigType::HitStop_SyncFist].value * 1000));
 					break;
 				case iWepType::Dagger:
-					t = new thread([](thread* t)-> void {
-						(*(UInt32*)(ptr_UnknownDataHolder + 0x160))++;
-						std::this_thread::sleep_for(std::chrono::milliseconds((int)floor(ConfigManager::GetConfig()[iConfigType::HitBlur_Dagger].value * 1000)));
-						(*(UInt32*)(ptr_UnknownDataHolder + 0x160))--;
-					}, t);
+					t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_Dagger].value * 1000),
+								   floor(ConfigManager::GetConfig()[iConfigType::HitStop_SyncDagger].value * 1000));
 					break;
 				case iWepType::OneH:
-					t = new thread([](thread* t)-> void {
-						(*(UInt32*)(ptr_UnknownDataHolder + 0x160))++;
-						std::this_thread::sleep_for(std::chrono::milliseconds((int)floor(ConfigManager::GetConfig()[iConfigType::HitStop_1H].value * 1000)));
-						(*(UInt32*)(ptr_UnknownDataHolder + 0x160))--;
-					}, t);
+					t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_1H].value * 1000),
+								   floor(ConfigManager::GetConfig()[iConfigType::HitStop_Sync1H].value * 1000));
 					break;
 				case iWepType::TwoH:
-					t = new thread([](thread* t)-> void {
-						(*(UInt32*)(ptr_UnknownDataHolder + 0x160))++;
-						std::this_thread::sleep_for(std::chrono::milliseconds((int)floor(ConfigManager::GetConfig()[iConfigType::HitStop_2H].value * 1000)));
-						(*(UInt32*)(ptr_UnknownDataHolder + 0x160))--;
-					}, t);
+					t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_2H].value * 1000),
+								   floor(ConfigManager::GetConfig()[iConfigType::HitStop_Sync2H].value * 1000));
 					break;
 			}
 			t->detach();
