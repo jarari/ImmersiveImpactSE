@@ -17,7 +17,7 @@ StaggerTask* StaggerTask::Create(Actor* target, float dir, float mag) {
 	return cmd;
 }
 
-int framedelay = 3;
+int framedelay = 6;
 void StaggerTask::Run() {
 	if (!target ||
 		ActorManager::IsInKillmove(target) || //killmove
