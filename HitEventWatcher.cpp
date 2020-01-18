@@ -160,7 +160,8 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 		PlayerCameraEx* pcam = (PlayerCameraEx*)PlayerCamera::GetSingleton();
 		NiPoint3 dpos = (NiPoint3(pcam->posX, pcam->posY, pcam->posZ) - target->pos);
 		float dist = sqrt(dpos.x * dpos.x + dpos.y * dpos.y + dpos.z * dpos.z);
-		float vol = min(max(500.0f - dist, 0.0f) / 100.0f, 1.0f);
+		float maxDist = 1500.0f;
+		float vol = min(max(maxDist - dist, 0.0f) / maxDist, 1.0f);
 		ActorManager::deflectAttack(target, ae, isArrow, true, vol);
 		evn->flags = TESHitEvent::kFlag_Blocked;
 		if (attacker == *g_thePlayer) {
