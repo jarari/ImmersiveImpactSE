@@ -27,6 +27,8 @@ void HitEventTask::UpdateDamage(float dmg) {
 	damage = dmg;
 }
 
+float pi = 3.1415926535f;
+float pi2 = pi * 2.0f;
 void HitEventTask::Run() {
 	if (!attacker ||
 		ActorManager::IsInKillmove(attacker) || //killmove
@@ -45,7 +47,12 @@ void HitEventTask::Run() {
 		CALL_MEMBER_FN(&(target->animGraphHolder), SetAnimationVariableFloat)(BSFixedString("staggerMagnitude"), staggerMagnitude);*/
 		float bowDivider = isArrow ? 4.0f : 1.0f;
 		float staggerMagnitude = min(max(-damage, 5.0f) / ConfigManager::GetConfig()[iConfigType::StaggerDamageMax].value * staggerMul, 1) / bowDivider / (ae->magnitude + 1);
-		float staggerDir = 0.5f - (target->rot.z - attacker->rot.z) / M_PI;
+		float dAng = target->rot.z - attacker->rot.z;
+		float staggerDir = (pi - dAng) / pi2;
+		if (staggerDir > 1)
+			staggerDir -= 1.0f;
+		else if (staggerDir < 0)
+			staggerDir += 1.0f;
 		StaggerTask* cmd = StaggerTask::Create(target, staggerDir, staggerMagnitude);
 		if (cmd) {
 			((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->SendAnimationEvent("staggerStop");
