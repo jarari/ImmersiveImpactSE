@@ -16,7 +16,7 @@ public:
 		mm->MenuOpenCloseEventDispatcher()->AddEventSink(instance);
 	}
 
-	~MenuWatcher() {
+	virtual ~MenuWatcher() {
 		_MESSAGE((className + std::string(" instance destroyed.")).c_str());
 	}
 

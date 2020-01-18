@@ -18,7 +18,7 @@ public:
 		((EventDispatcherListEx*)GetEventDispatcherList())->hitEventDispatcher.AddEventSink(this);
 	}
 
-	~HitEventWatcher() {
+	virtual ~HitEventWatcher() {
 		_MESSAGE((className + std::string(" instance destroyed.")).c_str());
 	}
 

@@ -18,7 +18,7 @@ public:
 		GetEventDispatcherList()->objectLoadedDispatcher.AddEventSink(instance);
 	}
 
-	~ObjectLoadWatcher() {
+	virtual ~ObjectLoadWatcher() {
 		_MESSAGE((className + std::string(" instance destroyed.")).c_str());
 	}
 
