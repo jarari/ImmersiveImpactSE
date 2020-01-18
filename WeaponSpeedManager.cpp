@@ -6,6 +6,19 @@
 
 static bool movementRestrained = false;
 static bool viewRestrained = false;
+
+void WeaponSpeedManager::ResetRestraintChecker() {
+	if (movementRestrained) {
+		movementRestrained = false;
+		ActorManager::RestrainPlayerMovement(false);
+	}
+	if (viewRestrained) {
+		viewRestrained = false;
+		if((*g_thePlayer)->actorState.IsWeaponDrawn())
+			ActorManager::RestrainPlayerView(false);
+	}
+}
+
 void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 	if (a == *g_thePlayer && a->actorState.IsWeaponDrawn()) {
 		if (evn == iSwingState::PrePre || evn == iSwingState::Pre) {

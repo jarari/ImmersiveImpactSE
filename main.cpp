@@ -8,6 +8,7 @@
 #include "MenuWatcher.h"
 #include "ObjectLoadWatcher.h"
 #include "StaggerTask.h"
+#include "WeaponSpeedManager.h"
 #include <common\IDebugLog.h>
 #include <skse64_common\BranchTrampoline.h>
 #include <skse64_common\skse_version.h>
@@ -63,6 +64,7 @@ extern "C" {
 				HitEventPool::ResetPool();
 				StaggerPool::ResetPool();
 				ConfigManager::GetInstance()->LoadConfigs();
+				WeaponSpeedManager::ResetRestraintChecker();
 			}
 			else if (msg->type == SKSEMessagingInterface::kMessage_DataLoaded) {
 				AddressManager* am = new AddressManager();

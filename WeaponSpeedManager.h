@@ -16,5 +16,6 @@ enum iWepType {
 };
 class Actor;
 namespace WeaponSpeedManager {
+	void ResetRestraintChecker();
 	void EvaluateEvent(Actor* a, int evn);
 }
