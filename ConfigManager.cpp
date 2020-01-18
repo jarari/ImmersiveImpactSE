@@ -43,8 +43,8 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("StaggerLimit", 3.0f));
 	configs.push_back(Config("StaggerDamageMax", 100.0f));
 	configs.push_back(Config("StaggerAny", 0));
-	configs.push_back(Config("EnableDash", 0));
 	configs.push_back(Config("StaggerArmorCap", 300.0f));
+	configs.push_back(Config("EnableDash", 0));
 	configs.push_back(Config("EnableHitStop", 0));
 	configs.push_back(Config("HitStop_OnPlayerHit", 0));
 	configs.push_back(Config("HitStop_OnObjectHit", 0));
