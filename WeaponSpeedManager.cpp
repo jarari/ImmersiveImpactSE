@@ -4,13 +4,19 @@
 #include "Utils.h"
 #include <skse64\GameData.h>
 
+static bool movementRestrained = false;
+static bool viewRestrained = false;
 void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 	if (a == *g_thePlayer) {
 		if (evn == iSwingState::PrePre || evn == iSwingState::Pre) {
-			if(ConfigManager::GetConfig()[iConfigType::RestrainMovement].value)
+			if (ConfigManager::GetConfig()[iConfigType::RestrainMovement].value) {
 				ActorManager::RestrainPlayerMovement(true);
-			if (ConfigManager::GetConfig()[iConfigType::RestrainAim].value)
+				movementRestrained = true;
+			}
+			if (ConfigManager::GetConfig()[iConfigType::RestrainAim].value) {
 				ActorManager::RestrainPlayerView(true);
+				viewRestrained = true;
+			}
 		}
 		else if (evn == iSwingState::Hit) {
 			if (ConfigManager::GetConfig()[iConfigType::EnableDash].value && !ActorManager::IsInKillmove(a)) {
@@ -21,9 +27,9 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 			}
 		}
 		else if (evn == iSwingState::End) {
-			if (ConfigManager::GetConfig()[iConfigType::RestrainMovement].value)
+			if (ConfigManager::GetConfig()[iConfigType::RestrainMovement].value && movementRestrained)
 				ActorManager::RestrainPlayerMovement(false);
-			if (ConfigManager::GetConfig()[iConfigType::RestrainAim].value)
+			if (ConfigManager::GetConfig()[iConfigType::RestrainAim].value && viewRestrained)
 				ActorManager::RestrainPlayerView(false);
 		}
 	}
