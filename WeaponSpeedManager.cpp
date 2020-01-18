@@ -27,10 +27,14 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 			}
 		}
 		else if (evn == iSwingState::End) {
-			if (ConfigManager::GetConfig()[iConfigType::RestrainMovement].value && movementRestrained)
+			if (ConfigManager::GetConfig()[iConfigType::RestrainMovement].value && movementRestrained) {
 				ActorManager::RestrainPlayerMovement(false);
-			if (ConfigManager::GetConfig()[iConfigType::RestrainAim].value && viewRestrained)
+				movementRestrained = false;
+			}
+			if (ConfigManager::GetConfig()[iConfigType::RestrainAim].value && viewRestrained) {
 				ActorManager::RestrainPlayerView(false);
+				viewRestrained = false;
+			}
 		}
 	}
 	if (!ConfigManager::GetConfig()[iConfigType::EnableWeaponSpeed].value)
