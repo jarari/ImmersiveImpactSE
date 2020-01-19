@@ -8,34 +8,35 @@
 #include <skse64\GameData.h>
 #include <skse64\GameReferences.h>
 #include <skse64\PapyrusVM.h>
-#include <thread>
-using std::thread;
 
 void HitStopThreadFunc(int duration, int sync) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(sync)); //Hit frame sync
 
 	PlayerCameraEx* pCam = (PlayerCameraEx*)PlayerCamera::GetSingleton();
-	float oldFov = pCam->worldFOV;
-	float oldFPFov = pCam->firstPersonFOV;
 	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))++;
 	int slept = 0;
 	int sleepPerCall = duration / 15;
 	float fovStep = ConfigManager::GetConfig()[iConfigType::HitStop_FovStep].value;
+	float fovDiff = 0;
 	while (slept < duration) {
 		if (slept < duration / 2) {
 			pCam->worldFOV -= fovStep;
 			pCam->firstPersonFOV -= fovStep;
+			fovDiff -= fovStep;
 		}
 		else {
 			pCam->worldFOV += fovStep;
 			pCam->firstPersonFOV += fovStep;
+			fovDiff += fovStep;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(sleepPerCall));
 		slept += sleepPerCall;
 	}
 	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))--;
-	pCam->worldFOV = oldFov;
-	pCam->firstPersonFOV = oldFPFov;
+	pCam->worldFOV -= fovDiff;
+	pCam->firstPersonFOV -= fovDiff;
+	HitStopThreadManager::running = false;
+	HitStopThreadManager::RequestLaunch();
 }
 
 void HitStopManager::FindBlurEffect() {
@@ -92,7 +93,8 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 								   floor(ConfigManager::GetConfig()[iConfigType::HitStop_Sync2H].value * 1000));
 					break;
 			}
-			t->detach();
+			HitStopThreadManager::threadQueue.push(t);
+			HitStopThreadManager::RequestLaunch();
 		}
 	}
 
@@ -167,4 +169,16 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 			ApplyImageSpaceModifier(blurModifier, mag, NULL);
 		}
 	}
+}
+
+void HitStopThreadManager::RequestLaunch() {
+	if (running) return;
+	threadQueue_Lock.Enter();
+	if (!threadQueue.empty()) {
+		thread* t = threadQueue.front();
+		threadQueue.pop();
+		t->detach();
+		HitStopThreadManager::running = true;
+	}
+	threadQueue_Lock.Leave();
 }
