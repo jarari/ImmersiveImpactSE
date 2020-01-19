@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include "WeaponSpeedManager.h"
 #include <skse64\GameReferences.h>
+#include <skse64\GameRTTI.h>
 #include <skse64\PapyrusVM.h>
 #include <sstream>
 #include <iomanip>
@@ -119,4 +120,12 @@ int Utils::GetWeaponType(TESObjectWEAP* wep) {
 		return iWepType::Fist;
 	}
 	return iWepType::None;
+}
+
+const char* Utils::GetName(TESForm* form) {
+	TESFullName* pFullName = DYNAMIC_CAST(form, TESForm, TESFullName);
+	const char* name = "Unknown";
+	if (pFullName)
+		name = pFullName->name.data;
+	return name;
 }

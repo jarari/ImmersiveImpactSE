@@ -4,6 +4,7 @@ class Actor;
 class ActiveEffect;
 class NiPoint3;
 class NiMatrix33;
+class TESForm;
 class TESObjectREFR;
 class TESObjectWEAP;
 class TESSound;
@@ -28,4 +29,5 @@ namespace Utils{
 	UInt32 SoundPlay(TESSound* sound, TESObjectREFR* obj);
 	void SetInstanceVolume(UInt32 instance, float volume);
 	int GetWeaponType(TESObjectWEAP* wep);
+	const char* GetName(TESForm* form);
 }
