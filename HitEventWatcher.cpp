@@ -113,9 +113,9 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 
 	ae->duration = ae->elapsed;
 
-	bool blocked = evn->flags == TESHitEvent::kFlag_Blocked;
-	bool powerattack = evn->flags == TESHitEvent::kFlag_PowerAttack;
-	bool bash = evn->flags == TESHitEvent::kFlag_Bash;
+	bool blocked = (evn->flags & TESHitEvent::kFlag_Blocked) == TESHitEvent::kFlag_Blocked;
+	bool powerattack = (evn->flags & TESHitEvent::kFlag_PowerAttack) == TESHitEvent::kFlag_PowerAttack;
+	bool bash = (evn->flags & TESHitEvent::kFlag_Bash) == TESHitEvent::kFlag_Bash;
 
 	//Dump(evn, 256);
 	TESObjectWEAP* wep = (TESObjectWEAP*)LookupFormByID(evn->sourceFormID);
@@ -135,6 +135,7 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 	if (blocked
 		&& !powerattack
 		&& !bash) {
+		_MESSAGE("%s -> %s blocked", Utils::GetName(attacker->baseForm), Utils::GetName(target->baseForm));
 		ActorManager::deflectAttack(target, ae, isArrow, false);
 		return kEvent_Continue;
 	}
@@ -176,7 +177,8 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 		float maxDist = 1500.0f;
 		float vol = min(max(maxDist - dist, 0.0f) / maxDist, 1.0f);*/
 		ActorManager::deflectAttack(target, ae, isArrow, true);
-		evn->flags = TESHitEvent::kFlag_Blocked;
+		evn->flags &= ~(UInt32)0x8;
+		evn->flags |= TESHitEvent::kFlag_Blocked;
 		if (attacker == *g_thePlayer) {
 			char buff[64];
 			/*TESFullName* pFullName = DYNAMIC_CAST(target->baseForm, TESForm, TESFullName);
