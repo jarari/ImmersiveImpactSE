@@ -78,34 +78,9 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 	int weptype_r = Utils::GetWeaponType(((TESObjectWEAP*)a->GetEquippedObject(false)));
 	int weptype_l = Utils::GetWeaponType(((TESObjectWEAP*)a->GetEquippedObject(true)));
 
-	float speed_r = 1;
-	float speed_l = 1;
-	switch (evn) {
-		case iSwingState::PrePre:
-			speed_r = ConfigManager::GetConfig()[weptype_r * 5 + 1].value;
-			speed_l = ConfigManager::GetConfig()[weptype_l * 5 + 1].value;
-			break;
-		case iSwingState::Pre:
-			speed_r = ConfigManager::GetConfig()[weptype_r * 5 + 2].value;
-			speed_l = ConfigManager::GetConfig()[weptype_l * 5 + 2].value;
-			break;
-		case iSwingState::Swing:
-			speed_r = ConfigManager::GetConfig()[weptype_r * 5 + 3].value;
-			speed_l = ConfigManager::GetConfig()[weptype_l * 5 + 3].value;
-			break;
-		case iSwingState::SwingL:
-			speed_r = ConfigManager::GetConfig()[weptype_r * 5 + 3].value;
-			speed_l = ConfigManager::GetConfig()[weptype_l * 5 + 3].value;
-			break;
-		case iSwingState::Hit:
-			speed_r = ConfigManager::GetConfig()[weptype_r * 5 + 4].value;
-			speed_l = ConfigManager::GetConfig()[weptype_l * 5 + 4].value;
-			break;
-		case iSwingState::End:
-			speed_r = ConfigManager::GetConfig()[weptype_r * 5 + 5].value;
-			speed_l = ConfigManager::GetConfig()[weptype_l * 5 + 5].value;
-			break;
-	}
+	float speed_r = ConfigManager::GetConfig()[weptype_r * 5 + evn + 1].value;
+	float speed_l = ConfigManager::GetConfig()[weptype_l * 5 + evn + 1].value;
+
 	if (weptype_r != iWepType::None)
 		ActorManager::SetCurrentAV(a, "WeaponSpeedMult", speed_r + offset_r->magnitude);
 	if (weptype_l != iWepType::None)
