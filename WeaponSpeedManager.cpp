@@ -55,7 +55,7 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 	ActiveEffect* offset_r = Utils::GetActiveEffectFromActor(a, "BingleWeaponSpeedOffset_R");
 	ActiveEffect* offset_l = Utils::GetActiveEffectFromActor(a, "BingleWeaponSpeedOffset_L");
 	if (!offset_r || !offset_l) {
-		_MESSAGE("Weapon speed effects not found!");
+		_MESSAGE("Weapon speed effects not found in actor %s", Utils::GetName(a->baseForm));
 		return;
 	}
 	//Calculate offset
@@ -70,8 +70,11 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 		ActiveEffect* ae = it.Get();
 		//Instead of looking for specific for ids, look for what actorvalue does this ActiveEffect change.
 		if (ae->actorValue == ActorManager::GetActorValuePointerFromMap("WeaponSpeedMult")) {
-			offset_r->magnitude += ae->magnitude - 1;
-			offset_l->magnitude += ae->magnitude - 1;
+			float mag = ae->magnitude;
+			if (ae->item && ae->item->formID < 0x06000000)
+				mag -= 1.0f;
+			offset_r->magnitude += mag;
+			offset_l->magnitude += mag;
 		}
 		++it;
 	}
