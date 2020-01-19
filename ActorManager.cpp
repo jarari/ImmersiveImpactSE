@@ -32,7 +32,6 @@ void ActorManager::deflectAttack(Actor* actor, ActiveEffect* ae, bool isArrow, b
 		UInt32 sound = Utils::SoundPlay(deflectSound, actor);
 		if (sound != -1) {
 			Utils::SetInstanceVolume(sound, volume);
-			_MESSAGE("Sound instance %u vol %f", sound, volume);
 		}
 	}
 }
