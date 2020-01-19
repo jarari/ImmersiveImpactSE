@@ -4,6 +4,7 @@
 #include "StaggerTask.h"
 #include <common\IMemPool.h>
 #include <skse64\GameReferences.h>
+#include "Utils.h"
 IThreadSafeBasicMemPool<StaggerTask, 256>	s_StaggerTaskDelegatePool;
 
 StaggerTask* StaggerTask::Create(Actor* attacker, Actor* target, float dir, float mag) {
@@ -34,6 +35,7 @@ void StaggerTask::Run() {
 	SetAnimationVariableFloat(& target->animGraphHolder, "staggerDirection", dir);
 	SetAnimationVariableFloat(& target->animGraphHolder, "staggerMagnitude", mag);
 	((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->SendAnimationEvent("staggerStart");
+	_MESSAGE("%s -> %s stagger", Utils::GetName(attacker->baseForm), Utils::GetName(target->baseForm));
 }
 
 void StaggerTask::Dispose() {
