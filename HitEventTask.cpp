@@ -30,7 +30,8 @@ void HitEventTask::UpdateDamage(float dmg) {
 float pi = 3.1415926535f;
 float pi2 = pi * 2.0f;
 void HitEventTask::Run() {
-	if (!attacker ||
+	if (!ConfigManager::GetConfig()[iConfigType::EnableHitFeedback].value ||
+		!attacker ||
 		ActorManager::IsInKillmove(attacker) || //killmove
 		attacker->IsDead(1) ||
 		!target ||
@@ -39,7 +40,6 @@ void HitEventTask::Run() {
 		damage > -0.5f)
 		return;
 	if (ae->magnitude >= ConfigManager::GetConfig()[iConfigType::StaggerLimit].value) {
-		ActorManager::deflectAttack(target, ae, isArrow, false);
 		return;
 	}
 	else {
@@ -53,7 +53,7 @@ void HitEventTask::Run() {
 			staggerDir -= 1.0f;
 		else if (staggerDir < 0)
 			staggerDir += 1.0f;
-		StaggerTask* cmd = StaggerTask::Create(target, staggerDir, staggerMagnitude);
+		StaggerTask* cmd = StaggerTask::Create(attacker, target, staggerDir, staggerMagnitude);
 		if (cmd) {
 			((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->SendAnimationEvent("staggerStop");
 			StaggerPool::AddTask(cmd);
