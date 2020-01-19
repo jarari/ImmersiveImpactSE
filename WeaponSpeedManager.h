@@ -3,7 +3,6 @@ enum iSwingState {
 	PrePre,
 	Pre,
 	Swing,
-	SwingL,
 	Hit,
 	End
 };

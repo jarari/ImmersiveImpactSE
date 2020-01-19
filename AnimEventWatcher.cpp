@@ -28,7 +28,7 @@ EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, Event
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::Swing);
 	}
 	else if (strcmp(evn->eventname, "weaponLeftSwing") == 0) {
-		WeaponSpeedManager::EvaluateEvent(a, iSwingState::SwingL);
+		WeaponSpeedManager::EvaluateEvent(a, iSwingState::Swing);
 	}
 	else if (strcmp(evn->eventname, "HitFrame") == 0) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::Hit);
