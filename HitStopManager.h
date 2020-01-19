@@ -1,4 +1,5 @@
 #pragma once
+#include <skse64\GameMenus.h>
 #include <common\ICriticalSection.h>
 #include <queue>
 #include <thread>
@@ -20,3 +21,21 @@ namespace HitStopThreadManager {
 	static thread* lastThread;
 	void RequestLaunch();
 }
+
+class HitStopHelper : public IMenu {
+public:
+	HitStopHelper() {
+		InitMovie();
+		unk0C = 0x2;
+		flags = 0x18103;
+	}
+	static void Register() {
+		MenuManager* mm = MenuManager::GetSingleton();
+		if (!mm)
+			return;
+		mm->Register("BingleHitStopHelper", []()->IMenu * {
+			HitStopHelper* helper = new HitStopHelper();
+			return helper;
+		});
+	}
+};

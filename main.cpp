@@ -72,6 +72,7 @@ extern "C" {
 				ActorManager::FindDeflectSound();
 				HitStopManager::FindBlurEffect();
 				StaggerHelper::Register();
+				HitStopHelper::Register();
 				MenuWatcher::InitWatcher();
 				HitEventWatcher::InitWatcher();
 				ObjectLoadWatcher::InitWatcher();

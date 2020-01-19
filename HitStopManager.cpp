@@ -8,12 +8,15 @@
 #include <skse64\GameData.h>
 #include <skse64\GameReferences.h>
 #include <skse64\PapyrusVM.h>
+#include <thread>
+using std::thread;
 
 void HitStopThreadFunc(int duration, int sync) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(sync)); //Hit frame sync
 
+	UIManager* ui = UIManager::GetSingleton();
 	PlayerCameraEx* pCam = (PlayerCameraEx*)PlayerCamera::GetSingleton();
-	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))++;
+	CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleHitStopHelper"), UIMessage::kMessage_Open, nullptr);
 	int slept = 0;
 	int sleepPerCall = duration / 15;
 	float fovStep = ConfigManager::GetConfig()[iConfigType::HitStop_FovStep].value;
@@ -32,9 +35,9 @@ void HitStopThreadFunc(int duration, int sync) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(sleepPerCall));
 		slept += sleepPerCall;
 	}
-	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))--;
 	pCam->worldFOV -= fovDiff;
 	pCam->firstPersonFOV -= fovDiff;
+	CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleHitStopHelper"), UIMessage::kMessage_Close, nullptr);
 	HitStopThreadManager::running = false;
 	HitStopThreadManager::RequestLaunch();
 }
@@ -56,8 +59,8 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 	if (!wep || wep->formType != kFormType_Weapon)
 		return;
 
-	bool powerattack = evn->flags == TESHitEvent::kFlag_PowerAttack;
-	bool bash = evn->flags == TESHitEvent::kFlag_Bash;
+	bool powerattack = (evn->flags & TESHitEvent::kFlag_PowerAttack) == TESHitEvent::kFlag_PowerAttack;
+	bool bash = (evn->flags & TESHitEvent::kFlag_Bash) == TESHitEvent::kFlag_Bash;
 	float strengthMul = min(powerattack + bash + 1.0f, 1.0f);
 	if ((wep->type() == TESObjectWEAP::GameData::kType_Bow
 		 || wep->type() == TESObjectWEAP::GameData::kType_Bow2
