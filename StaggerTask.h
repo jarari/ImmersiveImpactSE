@@ -9,11 +9,12 @@ class Actor;
 
 class StaggerTask : public TaskDelegate {
 public:
-	static StaggerTask* Create(Actor* target, float dir, float mag);
+	static StaggerTask* Create(Actor* attcker, Actor* target, float dir, float mag);
 	virtual void Run();
 	virtual void Dispose();
 	int counter;
 private:
+	Actor* attacker;
 	Actor* target;
 	float dir;
 	float mag;
