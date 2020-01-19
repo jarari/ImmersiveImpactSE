@@ -183,7 +183,7 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 			const char* name = "Unknown";
 			if (pFullName)
 				name = pFullName->name.data;*/
-			snprintf(buff, sizeof buff, "\xEA\xB3\xB5\xEA\xB2\xA9\xEC\x9D\xB4 \xEC\xA0\x9C\xEB\x8C\x80\xEB\xA1\x9C \xEB\x93\xA4\xEC\x96\xB4\xEA\xB0\x80\xEC\xA7\x80 \xEC\x95\x8A\xEC\x95\x98\xEB\x8B\xA4!\0");
+			snprintf(buff, sizeof buff, "$BINGLE_IIPT_DEFLECT");
 			Utils::SendNotification(buff);
 		}
 		ae->magnitude = ConfigManager::GetConfig()[iConfigType::StaggerLimit].value;
