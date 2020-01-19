@@ -27,11 +27,16 @@ void HookDamageCalculation() {
 			cmp(rdi, rbx);
 			je(retn);
 
-			push(rax);
+			push(rax);					//rax, rcx, rdx, r8, r9, r10, r12, xmm0, xmm1, xmm2, ZF, CF are affected... Save all values
 			push(rcx);
 			push(rdx);
-			push(r8); 
-			lea(rsp, ptr[rsp - 0x40]);
+			push(r8);
+			sahf();
+			lea(rsp, ptr[rsp - 0x80]);
+			mov(ptr[rsp + 0x40], r12);
+			mov(ptr[rsp + 0x50], r10);
+			mov(ptr[rsp + 0x60], r9);
+			mov(ptr[rsp + 0x70], ah);
 			movdqu(xmm6, xmm0);
 			movdqu(xmm7, xmm1);
 			mov(rcx, rdi);
@@ -41,7 +46,14 @@ void HookDamageCalculation() {
 			movdqu(xmm2, xmm8);
 			movdqu(xmm1, xmm7);
 			movdqu(xmm0, xmm6);
-			lea(rsp, ptr[rsp + 0x40]);
+			movdqu(xmm6, xmm8);
+			movdqu(xmm7, xmm8);
+			mov(r12, ptr[rsp + 0x40]);
+			mov(r10, ptr[rsp + 0x50]);
+			mov(r9, ptr[rsp + 0x60]);
+			mov(ah, ptr[rsp + 0x70]);
+			lea(rsp, ptr[rsp + 0x80]);
+			lahf();
 			pop(r8);
 			pop(rdx);
 			pop(rcx);
@@ -127,7 +139,7 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 		return kEvent_Continue;
 	}
 
-	TESContainer* container = DYNAMIC_CAST(target->baseForm, TESForm, TESContainer);
+	/*TESContainer* container = DYNAMIC_CAST(target->baseForm, TESForm, TESContainer);
 	ExtraContainerChanges* pXContainerChanges = static_cast<ExtraContainerChanges*>(target->extraData.GetByType(kExtraData_ContainerChanges));
 	InventoryEntryData* objList = (InventoryEntryData*)pXContainerChanges->data->objList;
 	tList<EntryDataList>::Iterator it = ((tList<EntryDataList>*)objList)->Begin();
@@ -151,7 +163,8 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 		}
 		++it;
 	}
-	armorValue /= 100.0f;
+	armorValue /= 100.0f;*/
+	float armorValue = max(ActorManager::GetAV(target, "DamageResist"), 0);
 	float deflectChance = min(armorValue * ConfigManager::GetConfig()[iConfigType::DeflectChanceMul].value / 100.0f, ConfigManager::GetConfig()[iConfigType::DeflectChanceMax].value);
 	std::mt19937 e{ rd() }; // or std::default_random_engine e{rd()};
 	std::uniform_int_distribution<int> dist{ 0, 99 };
@@ -173,6 +186,7 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 			snprintf(buff, sizeof buff, "\xEA\xB3\xB5\xEA\xB2\xA9\xEC\x9D\xB4 \xEC\xA0\x9C\xEB\x8C\x80\xEB\xA1\x9C \xEB\x93\xA4\xEC\x96\xB4\xEA\xB0\x80\xEC\xA7\x80 \xEC\x95\x8A\xEC\x95\x98\xEB\x8B\xA4!\0");
 			Utils::SendNotification(buff);
 		}
+		ae->magnitude = ConfigManager::GetConfig()[iConfigType::StaggerLimit].value;
 		return kEvent_Continue;
 	}
 	else {
