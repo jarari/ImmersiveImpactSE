@@ -1,7 +1,6 @@
 #include "AddressManager.h"
 #include "ConfigManager.h"
 #include "HitStopManager.h"
-#include "HitStopThread.h"
 #include "ModifiedSKSE.h"
 #include "Utils.h"
 #include "WeaponSpeedManager.h"
