@@ -34,6 +34,7 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("Speed_2H_Swing", 1.7f));
 	configs.push_back(Config("Speed_2H_Hit", 1.8f));
 	configs.push_back(Config("Speed_2H_End", 0.7f));
+	configs.push_back(Config("FakeFist", 0));
 	configs.push_back(Config("RestrainMovement", 1));
 	configs.push_back(Config("RestrainAim", 1));
 	configs.push_back(Config("EnableHitFeedback", 1));

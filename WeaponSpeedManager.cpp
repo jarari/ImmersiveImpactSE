@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "INILibrary\SimpleIni.h"
 #include <skse64\GameData.h>
+#include <skse64\PapyrusActor.h>
 
 static bool movementRestrained = false;
 static bool viewRestrained = false;
@@ -76,6 +77,13 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 			if (ConfigManager::GetConfig()[iConfigType::RestrainAim].value && viewRestrained) {
 				ActorManager::RestrainPlayerView(false);
 				viewRestrained = false;
+			}
+			if (ConfigManager::GetConfig()[iConfigType::FakeFist].value) {
+				if (!a->GetEquippedObject(true) && !a->GetEquippedObject(false) &&
+					!a->leftHandSpell && !a->rightHandSpell) {
+					TESForm* fist = LookupFormByID(0x1F4);
+					papyrusActor::EquipItemEx(a, fist, 0, false, false);
+				}
 			}
 		}
 	}

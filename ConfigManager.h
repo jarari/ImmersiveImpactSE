@@ -38,6 +38,7 @@ enum iConfigType {
 	Speed_2H_Swing,
 	Speed_2H_Hit,
 	Speed_2H_End,
+	FakeFist,
 	RestrainMovement,
 	RestrainAim,
 	EnableHitFeedback,
