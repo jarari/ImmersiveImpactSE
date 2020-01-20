@@ -2,6 +2,7 @@
 #include "ConfigManager.h"
 #include "WeaponSpeedManager.h"
 #include "Utils.h"
+#include "INILibrary\SimpleIni.h"
 #include <skse64\GameData.h>
 
 static bool movementRestrained = false;
@@ -16,6 +17,34 @@ void WeaponSpeedManager::ResetRestraintChecker() {
 		viewRestrained = false;
 		if((*g_thePlayer)->actorState.IsWeaponDrawn())
 			ActorManager::RestrainPlayerView(false);
+	}
+}
+
+void WeaponSpeedManager::CompatibilityPatch() {
+	DataHandler* dh = DataHandler::GetSingleton();
+	CSimpleIniA* ini = ConfigManager::GetINI();
+	CSimpleIniA::TNamesDepend sections;
+	ini->GetAllSections(sections);
+	for (CSimpleIniA::TNamesDepend::iterator s_it = sections.begin(); s_it != sections.end(); s_it++) {
+		const ModInfo* mod = dh->LookupModByName(s_it->pItem);
+		if (mod) {
+			CSimpleIniA::TNamesDepend keys;
+			ini->GetAllKeys(s_it->pItem, keys);
+			for (CSimpleIniA::TNamesDepend::iterator k_it = keys.begin(); k_it != keys.end(); k_it++) {
+				if (std::stoi(ini->GetValue(s_it->pItem, k_it->pItem)) - 1 < 0) {
+					_MESSAGE("Index start is 1! Check ini settings.");
+					continue;
+				}
+				UInt32 LowerID = std::stoi(k_it->pItem, 0, 16);
+				UInt32 formID = mod->GetFormID(LowerID);
+				TESForm* form = LookupFormByID(formID);
+				if (form->formType == kFormType_Spell) {
+					auto effect = ((SpellItem*)form)->effectItemList[std::stoi(ini->GetValue(s_it->pItem, k_it->pItem)) - 1];
+					effect->magnitude += 1.0f;
+					_MESSAGE("Modified effect %s. New Magnitude : %f", Utils::GetName(effect->mgef), effect->magnitude);
+				}
+			}
+		}
 	}
 }
 
@@ -65,7 +94,7 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 	while (!it.End()) {
 		ActiveEffect* ae = it.Get();
 		//Instead of looking for specific for ids, look for what actorvalue does this ActiveEffect change.
-		if (ae->flags & ActiveEffect::kFlag_Inactive != ActiveEffect::kFlag_Inactive && 
+		if ((ae->flags & ActiveEffect::kFlag_Inactive) != ActiveEffect::kFlag_Inactive && 
 			ae->actorValue == ActorManager::GetActorValuePointerFromMap("WeaponSpeedMult")) {
 			float mag = ae->magnitude;
 			if (mag >= 1)

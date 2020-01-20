@@ -67,10 +67,13 @@ extern "C" {
 				WeaponSpeedManager::ResetRestraintChecker();
 			}
 			else if (msg->type == SKSEMessagingInterface::kMessage_DataLoaded) {
+				ConfigManager::GetInstance()->LoadConfigs();
+				ConfigManager::GetInstance()->UpdateINIWithCurrentValues();
 				AddressManager* am = new AddressManager();
 				am->FindAddresses();
 				ActorManager::FindDeflectSound();
 				HitStopManager::FindBlurEffect();
+				WeaponSpeedManager::CompatibilityPatch();
 				StaggerHelper::Register();
 				HitStopHelper::Register();
 				MenuWatcher::InitWatcher();
@@ -78,8 +81,6 @@ extern "C" {
 				ObjectLoadWatcher::InitWatcher();
 				AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&(*g_thePlayer)->animGraphEventSink);
 				ae->HookSink();
-				ConfigManager::GetInstance()->LoadConfigs();
-				ConfigManager::GetInstance()->UpdateINIWithCurrentValues();
 				_MESSAGE("Player : %llx", *g_thePlayer);
 			}
 		});

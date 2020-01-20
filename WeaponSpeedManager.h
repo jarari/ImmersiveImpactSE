@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+using std::vector;
 enum iSwingState {
 	PrePre,
 	Pre,
@@ -16,5 +18,6 @@ enum iWepType {
 class Actor;
 namespace WeaponSpeedManager {
 	void ResetRestraintChecker();
+	void CompatibilityPatch();
 	void EvaluateEvent(Actor* a, int evn);
 }
