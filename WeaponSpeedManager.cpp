@@ -79,8 +79,8 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 				viewRestrained = false;
 			}
 			if (ConfigManager::GetConfig()[iConfigType::FakeFist].value) {
-				if (!a->GetEquippedObject(true) && !a->GetEquippedObject(false) &&
-					!a->leftHandSpell && !a->rightHandSpell) {
+				if (!a->GetEquippedObject(false) && !a->GetEquippedObject(true) &&
+					!a->rightHandSpell && !a->leftHandSpell) {
 					TESForm* fist = LookupFormByID(0x1F4);
 					papyrusActor::EquipItemEx(a, fist, 0, false, false);
 				}
