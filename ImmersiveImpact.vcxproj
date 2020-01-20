@@ -55,7 +55,6 @@
     <ClInclude Include="HitEventTask.h" />
     <ClInclude Include="HitEventWatcher.h" />
     <ClInclude Include="HitStopManager.h" />
-    <ClInclude Include="HitStopThread.h" />
     <ClInclude Include="INILibrary\SimpleIni.h" />
     <ClInclude Include="MenuWatcher.h" />
     <ClInclude Include="ModifiedSKSE.h" />
