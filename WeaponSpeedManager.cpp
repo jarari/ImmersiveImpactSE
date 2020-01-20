@@ -65,7 +65,8 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 	while (!it.End()) {
 		ActiveEffect* ae = it.Get();
 		//Instead of looking for specific for ids, look for what actorvalue does this ActiveEffect change.
-		if (ae->actorValue == ActorManager::GetActorValuePointerFromMap("WeaponSpeedMult")) {
+		if (ae->flags & ActiveEffect::kFlag_Inactive == ActiveEffect::kFlag_Inactive && 
+			ae->actorValue == ActorManager::GetActorValuePointerFromMap("WeaponSpeedMult")) {
 			float mag = ae->magnitude;
 			if (mag > 1)
 				mag -= 1.0f;
