@@ -17,26 +17,9 @@ namespace HitStopManager {
 
 namespace HitStopThreadManager {
 	static ICriticalSection threadQueue_Lock;
+	static ICriticalSection gamePause_Lock;
 	static bool running;
 	static queue<thread*> threadQueue;
 	static thread* lastThread;
 	void RequestLaunch();
 }
-
-class HitStopHelper : public IMenu {
-public:
-	HitStopHelper() {
-		InitMovie();
-		unk0C = 0xD;
-		flags = 0x4881;
-	}
-	static void Register() {
-		MenuManager* mm = MenuManager::GetSingleton();
-		if (!mm)
-			return;
-		mm->Register("BingleHitStopHelper", []()->IMenu * {
-			HitStopHelper* helper = new HitStopHelper();
-			return helper;
-		});
-	}
-};

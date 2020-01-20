@@ -14,9 +14,11 @@ using std::thread;
 void HitStopThreadFunc(int duration, int sync) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(sync)); //Hit frame sync
 
+	HitStopThreadManager::gamePause_Lock.Enter();
 	UIManager* ui = UIManager::GetSingleton();
 	PlayerCameraEx* pCam = (PlayerCameraEx*)PlayerCamera::GetSingleton();
-	CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleHitStopHelper"), UIMessage::kMessage_Open, nullptr);
+	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))++;
+	//CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleHitStopHelper"), UIMessage::kMessage_Open, nullptr);
 	int slept = 0;
 	int sleepPerCall = duration / 15;
 	float fovStep = ConfigManager::GetConfig()[iConfigType::HitStop_FovStep].value;
@@ -37,7 +39,9 @@ void HitStopThreadFunc(int duration, int sync) {
 	}
 	pCam->worldFOV -= fovDiff;
 	pCam->firstPersonFOV -= fovDiff;
-	CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleHitStopHelper"), UIMessage::kMessage_Close, nullptr);
+	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))--;
+	//CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleHitStopHelper"), UIMessage::kMessage_Close, nullptr);
+	HitStopThreadManager::gamePause_Lock.Leave();
 	HitStopThreadManager::running = false;
 	HitStopThreadManager::RequestLaunch();
 }

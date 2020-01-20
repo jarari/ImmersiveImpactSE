@@ -76,7 +76,6 @@ extern "C" {
 				HitStopManager::UnleashCameraShakeLimit();
 				WeaponSpeedManager::CompatibilityPatch();
 				StaggerHelper::Register();
-				HitStopHelper::Register();
 				MenuWatcher::InitWatcher();
 				HitEventWatcher::InitWatcher();
 				ObjectLoadWatcher::InitWatcher();
