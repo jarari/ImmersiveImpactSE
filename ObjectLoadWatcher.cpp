@@ -22,7 +22,8 @@ EventResult ObjectLoadWatcher::ReceiveEvent(TESObjectLoadedEvent* evn, EventDisp
 	if (form && evn->loaded) {
 		Actor* _a = dynamic_cast<Actor*>(form);
 		Character* _c = dynamic_cast<Character*>(form);
-		if (_c && !CharacterHooked) {
+		PlayerCharacter* _p = dynamic_cast<PlayerCharacter*>(form);
+		if (_c && !_p && !CharacterHooked) {
 			TESFullName* pname = DYNAMIC_CAST(((Actor*)form)->baseForm, TESForm, TESFullName);
 			const char* name;
 			if (pname)
@@ -32,7 +33,7 @@ EventResult ObjectLoadWatcher::ReceiveEvent(TESObjectLoadedEvent* evn, EventDisp
 			ae->HookSink();
 			CharacterHooked = true;
 		}
-		else if (_a && !_c && !ActorHooked) {
+		/*else if (_a && !_c && !ActorHooked) {
 			TESFullName* pname = DYNAMIC_CAST(((Actor*)form)->baseForm, TESForm, TESFullName);
 			const char* name;
 			if (pname)
@@ -41,8 +42,8 @@ EventResult ObjectLoadWatcher::ReceiveEvent(TESObjectLoadedEvent* evn, EventDisp
 			AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&((Actor*)form)->animGraphEventSink);
 			ae->HookSink();
 			ActorHooked = true;
-		}
-		if (ActorHooked && CharacterHooked)
+		}*/
+		if (CharacterHooked)
 			RemoveWatcher();
 	}
 	return kEvent_Continue;
