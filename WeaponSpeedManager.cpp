@@ -68,7 +68,7 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 		if (ae->flags & ActiveEffect::kFlag_Inactive == ActiveEffect::kFlag_Inactive && 
 			ae->actorValue == ActorManager::GetActorValuePointerFromMap("WeaponSpeedMult")) {
 			float mag = ae->magnitude;
-			if (mag > 1)
+			if (mag >= 1)
 				mag -= 1.0f;
 			offset_r += mag;
 			offset_l += mag;
