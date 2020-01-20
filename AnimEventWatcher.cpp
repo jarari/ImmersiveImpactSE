@@ -16,9 +16,10 @@ void AnimEventWatcher::HookSink() {
 
 
 EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, EventDispatcher<BSAnimationGraphEvent>* dispatcher) {
-	//_MESSAGE("Event : %llx, dispatcher: %llx, event name : %s, animGraphEventSink %llx", evn, dispatcher, evn->eventname, this);
 	Actor* a = *(Actor * *)((UInt64)evn + 0x8);
-	if (strcmp(evn->eventname, "PowerAttack_Start_end") == 0) {
+	/*if(a == *g_thePlayer)
+		_MESSAGE("Event : %llx, dispatcher: %llx, event name : %s, animGraphEventSink %llx", evn, dispatcher, evn->eventname, this);*/
+	if (strcmp(evn->eventname, "PowerAttack_Start_End") == 0) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::PrePre);
 	}
 	else if (strcmp(evn->eventname, "preHitFrame") == 0) {
