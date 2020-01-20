@@ -102,7 +102,8 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 	//If the damage is done by magic
 	//If the target cannot be knock-downed.
 	if (evn->projectileFormID != 0
-		|| (!ActorManager::CanBeKnockdown(target) && target != *g_thePlayer && ConfigManager::GetConfig()[iConfigType::StaggerAny].value == 0))
+		|| ((!ActorManager::CanBeKnockdown(target) || ActorManager::GetAV(target, "Mass") >= 2)
+			&& target != *g_thePlayer && ConfigManager::GetConfig()[iConfigType::StaggerAny].value == 0))
 		return kEvent_Continue;
 
 	if (ae == nullptr)
