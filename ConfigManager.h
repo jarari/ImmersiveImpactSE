@@ -105,6 +105,10 @@ public:
 		return configs;
 	}
 
+	static CSimpleIniA* GetINI() {
+		return &ini;
+	}
+
 	void InitializeConfigDefaults();
 
 	void InitializeINI();
