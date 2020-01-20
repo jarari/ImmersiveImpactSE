@@ -11,6 +11,7 @@ class TESImageSpaceModifier;
 namespace HitStopManager {
 	static TESImageSpaceModifier* blurModifier;
 	void FindBlurEffect();
+	void UnleashCameraShakeLimit();
 	void EvaluateEvent(TESHitEvent* evn);
 }
 
@@ -26,8 +27,8 @@ class HitStopHelper : public IMenu {
 public:
 	HitStopHelper() {
 		InitMovie();
-		unk0C = 0x2;
-		flags = 0x18103;
+		unk0C = 0xD;
+		flags = 0x4881;
 	}
 	static void Register() {
 		MenuManager* mm = MenuManager::GetSingleton();

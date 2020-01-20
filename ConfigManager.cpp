@@ -62,23 +62,35 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("HitShakeController_OnPlayerHit", 1));
 	configs.push_back(Config("HitShakeController_OnObjectHit", 1));
 	configs.push_back(Config("HitShakeController_Fist", 0.3f));
+	configs.push_back(Config("HitShakeController_Fist_Duration", 0.25f));
 	configs.push_back(Config("HitShakeController_Dagger", 0.2f));
+	configs.push_back(Config("HitShakeController_Dagger_Duration", 0.2f));
 	configs.push_back(Config("HitShakeController_1H", 0.4f));
+	configs.push_back(Config("HitShakeController_1H_Duration", 0.25f));
 	configs.push_back(Config("HitShakeController_2H", 0.5f));
+	configs.push_back(Config("HitShakeController_2H_Duration", 0.35f));
 	configs.push_back(Config("EnableHitShakeCam", 0));
 	configs.push_back(Config("HitShakeCam_OnPlayerHit", 1));
 	configs.push_back(Config("HitShakeCam_OnObjectHit", 1));
 	configs.push_back(Config("HitShakeCam_Fist", 0.3f));
+	configs.push_back(Config("HitShakeCam_Fist_Duration", 0.25f));
 	configs.push_back(Config("HitShakeCam_Dagger", 0.2f));
+	configs.push_back(Config("HitShakeCam_Dagger_Duration", 0.2f));
 	configs.push_back(Config("HitShakeCam_1H", 0.4f));
+	configs.push_back(Config("HitShakeCam_1H_Duration", 0.25f));
 	configs.push_back(Config("HitShakeCam_2H", 0.5f));
+	configs.push_back(Config("HitShakeCam_2H_Duration", 0.35f));
 	configs.push_back(Config("EnableHitBlur", 0));
 	configs.push_back(Config("HitBlur_OnPlayerHit", 1));
 	configs.push_back(Config("HitBlur_OnObjectHit", 1));
 	configs.push_back(Config("HitBlur_Fist", 0.3f));
+	configs.push_back(Config("HitBlur_Fist_Duration", 0.25f));
 	configs.push_back(Config("HitBlur_Dagger", 0.2f));
+	configs.push_back(Config("HitBlur_Dagger_Duration", 0.2f));
 	configs.push_back(Config("HitBlur_1H", 0.4f));
+	configs.push_back(Config("HitBlur_1H_Duration", 0.25f));
 	configs.push_back(Config("HitBlur_2H", 0.5f));
+	configs.push_back(Config("HitBlur_2H_Duration", 0.35f));
 }
 
 void ConfigManager::InitializeINI() {

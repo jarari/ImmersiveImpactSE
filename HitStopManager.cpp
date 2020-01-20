@@ -4,6 +4,7 @@
 #include "ModifiedSKSE.h"
 #include "Utils.h"
 #include "WeaponSpeedManager.h"
+#include <skse64_common\SafeWrite.h>
 #include <skse64\GameData.h>
 #include <skse64\GameReferences.h>
 #include <skse64\PapyrusVM.h>
@@ -49,6 +50,18 @@ void HitStopManager::FindBlurEffect() {
 	blurModifier = (TESImageSpaceModifier*)LookupFormByID(iimpt->GetFormID(0x0000A42E));
 	if (blurModifier)
 		_MESSAGE("Found the blur modifier at %llx", blurModifier);
+}
+
+void HitStopManager::UnleashCameraShakeLimit() {
+	vector<BYTE> patch1 = { 0x0F, 0x28, 0xD8, 0x90, 0x90, 0x90, 0x90, 0x90 };
+	for (int i = 0; i < patch1.size(); i++)
+		SafeWrite8(ptr_ShakeCameraNative + 0x12 + i, patch1[i]);
+
+	SInt32 offset = *(SInt32*)(ptr_ShakeCameraNative + 0x89);
+	uintptr_t patch2Func = ptr_ShakeCameraNative + offset + 0x15A; // +0x88 + 0x5 + 0xCD
+	vector<BYTE> patch2 = { 0x0F, 0x28, 0xD3, 0x90, 0x90, 0x90, 0x90, 0x90 };
+	for (int i = 0; i < patch2.size(); i++)
+		SafeWrite8(patch2Func + i, patch2[i]);
 }
 
 void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
@@ -105,21 +118,26 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 			(evn->target && evn->target == pc && ConfigManager::GetConfig()[iConfigType::HitShakeController_OnPlayerHit].value) ||
 			((evn->target && evn->target->formType != kFormType_Character || !evn->target) && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitShakeController_OnObjectHit].value)) {
 			float mag;
+			float dur;
 			switch (weptype) {
 				case iWepType::Fist:
 					mag = ConfigManager::GetConfig()[iConfigType::HitShakeController_Fist].value * strengthMul;
+					dur = ConfigManager::GetConfig()[iConfigType::HitShakeController_Fist_Duration].value * strengthMul;
 					break;
 				case iWepType::Dagger:
 					mag = ConfigManager::GetConfig()[iConfigType::HitShakeController_Dagger].value * strengthMul;
+					dur = ConfigManager::GetConfig()[iConfigType::HitShakeController_Dagger_Duration].value * strengthMul;
 					break;
 				case iWepType::OneH:
 					mag = ConfigManager::GetConfig()[iConfigType::HitShakeController_1H].value * strengthMul;
+					dur = ConfigManager::GetConfig()[iConfigType::HitShakeController_1H_Duration].value * strengthMul;
 					break;
 				case iWepType::TwoH:
 					mag = ConfigManager::GetConfig()[iConfigType::HitShakeController_2H].value * strengthMul;
+					dur = ConfigManager::GetConfig()[iConfigType::HitShakeController_2H_Duration].value * strengthMul;
 					break;
 			}
-			ShakeController(false, mag, mag, 0.25f * strengthMul);
+			ShakeController(false, mag, mag, dur * strengthMul);
 		}
 	}
 
@@ -130,21 +148,26 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 			VMClassRegistry* registry = (*g_skyrimVM)->GetClassRegistry();
 			if (registry) {
 				float mag;
+				float dur;
 				switch (weptype) {
 					case iWepType::Fist:
 						mag = ConfigManager::GetConfig()[iConfigType::HitShakeCam_Fist].value * strengthMul;
+						dur = ConfigManager::GetConfig()[iConfigType::HitShakeCam_Fist_Duration].value * strengthMul;
 						break;
 					case iWepType::Dagger:
 						mag = ConfigManager::GetConfig()[iConfigType::HitShakeCam_Dagger].value * strengthMul;
+						dur = ConfigManager::GetConfig()[iConfigType::HitShakeCam_Dagger_Duration].value * strengthMul;
 						break;
 					case iWepType::OneH:
 						mag = ConfigManager::GetConfig()[iConfigType::HitShakeCam_1H].value * strengthMul;
+						dur = ConfigManager::GetConfig()[iConfigType::HitShakeCam_1H_Duration].value * strengthMul;
 						break;
 					case iWepType::TwoH:
 						mag = ConfigManager::GetConfig()[iConfigType::HitShakeCam_2H].value * strengthMul;
+						dur = ConfigManager::GetConfig()[iConfigType::HitShakeCam_2H_Duration].value * strengthMul;
 						break;
 				}
-				ShakeCamera_Native(registry, 0, 0, pc, mag, 0.25f * strengthMul);
+				ShakeCamera_Native(registry, 0, 0, pc, mag, dur * strengthMul);
 			}
 		}
 	}
@@ -154,20 +177,26 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 			(evn->target && evn->target == pc && ConfigManager::GetConfig()[iConfigType::HitBlur_OnPlayerHit].value) ||
 			((evn->target && evn->target->formType != kFormType_Character || !evn->target) && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitBlur_OnObjectHit].value)) {
 			float mag;
+			float dur;
 			switch (weptype) {
 				case iWepType::Fist:
 					mag = ConfigManager::GetConfig()[iConfigType::HitBlur_Fist].value * strengthMul;
+					dur = ConfigManager::GetConfig()[iConfigType::HitBlur_Fist_Duration].value * strengthMul;
 					break;
 				case iWepType::Dagger:
 					mag = ConfigManager::GetConfig()[iConfigType::HitBlur_Dagger].value * strengthMul;
+					dur = ConfigManager::GetConfig()[iConfigType::HitBlur_Dagger_Duration].value * strengthMul;
 					break;
 				case iWepType::OneH:
 					mag = ConfigManager::GetConfig()[iConfigType::HitBlur_1H].value * strengthMul;
+					dur = ConfigManager::GetConfig()[iConfigType::HitBlur_1H_Duration].value * strengthMul;
 					break;
 				case iWepType::TwoH:
 					mag = ConfigManager::GetConfig()[iConfigType::HitBlur_2H].value * strengthMul;
+					dur = ConfigManager::GetConfig()[iConfigType::HitBlur_2H_Duration].value * strengthMul;
 					break;
 			}
+			*(float*)((UInt64)blurModifier + 0x24) = dur;
 			ApplyImageSpaceModifier(blurModifier, mag, NULL);
 		}
 	}

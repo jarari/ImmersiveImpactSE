@@ -73,6 +73,7 @@ extern "C" {
 				am->FindAddresses();
 				ActorManager::FindDeflectSound();
 				HitStopManager::FindBlurEffect();
+				HitStopManager::UnleashCameraShakeLimit();
 				WeaponSpeedManager::CompatibilityPatch();
 				StaggerHelper::Register();
 				HitStopHelper::Register();
