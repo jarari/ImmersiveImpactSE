@@ -135,7 +135,6 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 	if (blocked
 		&& !powerattack
 		&& !bash) {
-		_MESSAGE("%s -> %s blocked", Utils::GetName(attacker->baseForm), Utils::GetName(target->baseForm));
 		ActorManager::deflectAttack(target, ae, isArrow, false);
 		return kEvent_Continue;
 	}

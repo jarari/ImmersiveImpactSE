@@ -35,7 +35,6 @@ void StaggerTask::Run() {
 	SetAnimationVariableFloat(& target->animGraphHolder, "staggerDirection", dir);
 	SetAnimationVariableFloat(& target->animGraphHolder, "staggerMagnitude", mag);
 	((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->SendAnimationEvent("staggerStart");
-	_MESSAGE("%s -> %s stagger", Utils::GetName(attacker->baseForm), Utils::GetName(target->baseForm));
 }
 
 void StaggerTask::Dispose() {
