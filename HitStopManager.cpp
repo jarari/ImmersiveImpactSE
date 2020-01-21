@@ -77,7 +77,7 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 
 	bool powerattack = (evn->flags & TESHitEvent::kFlag_PowerAttack) == TESHitEvent::kFlag_PowerAttack;
 	bool bash = (evn->flags & TESHitEvent::kFlag_Bash) == TESHitEvent::kFlag_Bash;
-	float strengthMul = min(powerattack + bash + 1.0f, 1.0f);
+	float strengthMul = powerattack + 1.0f;
 	if ((wep->type() == TESObjectWEAP::GameData::kType_Bow
 		 || wep->type() == TESObjectWEAP::GameData::kType_Bow2
 		 || wep->type() == TESObjectWEAP::GameData::kType_CrossBow
@@ -141,7 +141,7 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 					dur = ConfigManager::GetConfig()[iConfigType::HitShakeController_2H_Duration].value * strengthMul;
 					break;
 			}
-			ShakeController(false, mag, mag, dur * strengthMul);
+			ShakeController(false, mag, mag, dur);
 		}
 	}
 
@@ -171,7 +171,7 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 						dur = ConfigManager::GetConfig()[iConfigType::HitShakeCam_2H_Duration].value * strengthMul;
 						break;
 				}
-				ShakeCamera_Native(registry, 0, 0, pc, mag, dur * strengthMul);
+				ShakeCamera_Native(registry, 0, 0, pc, mag, dur);
 			}
 		}
 	}
