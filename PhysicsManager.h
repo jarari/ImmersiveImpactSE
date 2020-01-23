@@ -120,14 +120,18 @@ struct PhysData {
 	PhysData() {
 		lastRun = std::chrono::system_clock::now();
 		velocity = hkVector4();
-		friction = 1.0f;
-		airdrag = 1.0f;
+	}
+	PhysData(float f, float d) : PhysData() {
+		friction = f;
+		airdrag = d;
 	}
 };
 
 namespace PhysicsManager {
+	extern float defaultFriction;
+	extern float defaultDrag;
 	static unordered_map<UInt64, PhysData> datamap;
-	bool ShouldOverrideVelocity(bhkCharacterController* cCon);
+	PhysData* ShouldOverrideVelocity(bhkCharacterController* cCon);
 	void HookOnGroundVelocity();
 	PhysData* GetData(Actor* a);
 	void AddVelocity(Actor* a, hkVector4 vel);

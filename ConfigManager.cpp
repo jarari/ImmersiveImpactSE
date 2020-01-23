@@ -96,8 +96,6 @@ void ConfigManager::InitializeConfigDefaults() {
 
 	physconfigs.clear();
 	physconfigs.push_back(Config("Tick", 0.030f));
-	physconfigs.push_back(Config("Friction", 1.0f));
-	physconfigs.push_back(Config("AirDrag", 1.0f));
 }
 
 void ConfigManager::InitializeINI() {

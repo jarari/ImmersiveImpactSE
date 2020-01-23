@@ -4,15 +4,20 @@
 #include <skse64_common\SafeWrite.h>
 #include <xbyak\xbyak.h>
 
-bool PhysicsManager::ShouldOverrideVelocity(bhkCharacterController* cCon) {
+float PhysicsManager::defaultFriction = 0.5f;
+float PhysicsManager::defaultDrag = 0.025f;
+
+PhysData* PhysicsManager::ShouldOverrideVelocity(bhkCharacterController* cCon) {
 	Actor* a = (Actor*)(**(UInt64 **)((UInt64)cCon + 0x10) - 0xD0);
-	if (datamap.count((UInt64)a))
-		return true;
-	return false;
+	if (datamap.count((UInt64)a)) {
+		PhysData* pd = GetData(a);
+		return pd;
+	}
+	return NULL;
 }
 
 void PhysicsManager::HookOnGroundVelocity() {
-	struct InstallHookOnGroundVelocity_Code : Xbyak::CodeGenerator {
+	/*struct InstallHookOnGroundVelocity_Code : Xbyak::CodeGenerator {
 		InstallHookOnGroundVelocity_Code(void* buf, uintptr_t shouldOverride) : Xbyak::CodeGenerator(4096, buf) {
 			Xbyak::Label retn;
 
@@ -24,24 +29,24 @@ void PhysicsManager::HookOnGroundVelocity() {
 			push(r10);
 			push(r11);
 			lahf();
+			sub(rsp, 8);	//align stack
 			lea(rsp, ptr[rsp - 0x100]);
 			mov(word[rsp + 0x90], ah);
-			movaps(xmm10, xmm0);
+			movaps(qword[rsp + 0x40], xmm0);
 			mov(rcx, rsi);
 			mov(rax, shouldOverride);
 			call(rax);
-			cmp(al, 0);
+			test(rax, rax);
 			mov(dword[rbp - 0x60], 0x3f800000);
 			je(retn);
-			/*mov(dword[rsp + 0x20], 0x40000000);
-			mulss(xmm1, dword[rsp + 0x20]);*/
-			mov(dword[rbp - 0x60], 0x3f000000);
+			mov(ecx, ptr[rax]);
+			mov(dword[rbp - 0x60], ecx);
 
 			L(retn);
-			movaps(xmm0, xmm10);
-			movaps(xmm10, xmm11);
+			movaps(xmm0, qword[rsp + 0x40]);
 			mov(ah, word[rsp + 0x90]);
 			lea(rsp, ptr[rsp + 0x100]);
+			add(rsp, 8);
 			sahf();
 			pop(r11);
 			pop(r10);
@@ -61,7 +66,11 @@ void PhysicsManager::HookOnGroundVelocity() {
 	if (!g_branchTrampoline.Write5Branch(ptr_VelocityInjectionPoint, uintptr_t(code.getCode())))
 		return;
 	SafeWrite8(ptr_VelocityInjectionPoint + 5, 0x90);
-	SafeWrite8(ptr_VelocityInjectionPoint + 6, 0x90);
+	SafeWrite8(ptr_VelocityInjectionPoint + 6, 0x90);*/
+
+	SafeWrite8(ptr_FrictionOverridePoint, 0x90);
+	SafeWrite8(ptr_FrictionOverridePoint + 1, 0x90);
+	SafeWrite8(ptr_FrictionOverridePoint + 2, 0x90);
 }
 
 int PhysData::tick = 30;
@@ -125,10 +134,10 @@ bool PhysicsManager::Simulate(Actor* a) {
 
 		float dt_t = min(dt / 6944.4f, 1.1f);
 		float len = vel.Length();
-		hkVector4 friction = vel * -1.0f / 25.0f * (float)onGround * pd->friction * dt_t;
+		hkVector4 friction = vel * -1.0f * (float)onGround * pd->friction * dt_t;
 		hkVector4 drag = vel;
 		drag.Normalize();
-		drag *= hkVector4(1.0f, 1.0f, 0.4f) * -0.01f * len * len * ((float)inWater + 1.0f) * pd->airdrag * dt_t;
+		drag *= hkVector4(1.0f, 1.0f, 0.01f) * -1.0f * len * len * ((float)inWater + 1.0f) * pd->airdrag * dt_t;
 
 		vel += pd->velocity;
 		pd->velocity = hkVector4();
@@ -140,7 +149,7 @@ bool PhysicsManager::Simulate(Actor* a) {
 }
 
 void PhysicsManager::InitializeData(Actor* a) {
-	datamap.insert(std::make_pair((UInt64)a, PhysData()));
+	datamap.insert(std::make_pair((UInt64)a, PhysData(PhysicsManager::defaultFriction, PhysicsManager::defaultDrag)));
 }
 
 void PhysicsManager::ResetPhysics() {

@@ -13,6 +13,7 @@ uintptr_t ptr_ShakeController;
 uintptr_t ptr_ShakeCameraNative;
 uintptr_t ptr_ApplyImageSpaceModifier;
 uintptr_t ptr_VelocityInjectionPoint;
+uintptr_t ptr_FrictionOverridePoint;
 
 _SendNotification SendNotification_Fn;
 _Play_Native Play_Native;
@@ -59,7 +60,6 @@ void AddressManager::FindAddresses() {
 	_MESSAGE("God Mode Bool %llx", ptr_GodMode);
 
 	uintptr_t dataholderOffset = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0xE8, 0x00, 0x00, 0x00, 0x00, 0x33, 0xC9, 0xE8, 0x00, 0x00, 0x00, 0x00, 0x84, 0xC0}, true) + 0x13;
-	_MESSAGE("dataholderOffset %llx", dataholderOffset);
 	ptr_UnknownDataHolder = *(uintptr_t*)(dataholderOffset + *(UInt32*)dataholderOffset + 0x4);
 	_MESSAGE("Unk Data Holder (For Pause/Resume) %llx", ptr_UnknownDataHolder); //0x160 = pause counter
 
@@ -77,6 +77,10 @@ void AddressManager::FindAddresses() {
 
 	ptr_VelocityInjectionPoint = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0x45, 0x0F, 0x57, 0xC0, 0xC7, 0x45, 0xA0}) + 0x4;
 	_MESSAGE("Velocity Hook Injection Point %llx", ptr_VelocityInjectionPoint);
+
+	uintptr_t calculateFrictionOffset = ptr_VelocityInjectionPoint + 0x116;
+	ptr_FrictionOverridePoint = (calculateFrictionOffset + *(UInt32*)(calculateFrictionOffset + 0x1) + 0x232);
+	_MESSAGE("Friction Override Point %llx", ptr_FrictionOverridePoint);
 
 	delete(mr);
 }

@@ -52,8 +52,8 @@ EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, Event
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
 	}
 	else if (strcmp(evn->eventname, "staggerStop") == 0) {
-		PhysicsManager::SetFriction(a, 1.0f);
-		PhysicsManager::SetDrag(a, 1.0f);
+		PhysicsManager::SetFriction(a, PhysicsManager::defaultFriction);
+		PhysicsManager::SetDrag(a, PhysicsManager::defaultDrag);
 	}
 	FnReceiveEvent fn = fnHash.at(*(UInt64*)this);
 	return fn ? (this->*fn)(evn, dispatcher) : kEvent_Continue;
