@@ -12,6 +12,7 @@ uintptr_t ptr_UnknownDataHolder;
 uintptr_t ptr_ShakeController;
 uintptr_t ptr_ShakeCameraNative;
 uintptr_t ptr_ApplyImageSpaceModifier;
+uintptr_t ptr_VelocityInjectionPoint;
 
 _SendNotification SendNotification_Fn;
 _Play_Native Play_Native;
@@ -73,6 +74,9 @@ void AddressManager::FindAddresses() {
 	ptr_ApplyImageSpaceModifier = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0x48, 0x89, 0x68, 0x18, 0x0F, 0x29, 0x70, 0xD8, 0x49, 0x8B, 0xF0}) - 0x17;
 	_MESSAGE("Function - Apply (ImageSpaceModifier) %llx", ptr_ApplyImageSpaceModifier);
 	ApplyImageSpaceModifier = (_ApplyImageSpaceModifier)ptr_ApplyImageSpaceModifier;
+
+	ptr_VelocityInjectionPoint = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0x45, 0x0F, 0x57, 0xC0, 0xC7, 0x45, 0xA0}) + 0x4;
+	_MESSAGE("Velocity Hook Injection Point %llx", ptr_VelocityInjectionPoint);
 
 	delete(mr);
 }

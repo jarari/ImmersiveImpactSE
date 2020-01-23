@@ -12,9 +12,9 @@
 using std::thread;
 
 void HitStopThreadFunc(int duration, int sync) {
+	HitStopThreadManager::gamePause_Lock.Enter();
 	std::this_thread::sleep_for(std::chrono::milliseconds(sync)); //Hit frame sync
 
-	HitStopThreadManager::gamePause_Lock.Enter();
 	UIManager* ui = UIManager::GetSingleton();
 	PlayerCameraEx* pCam = (PlayerCameraEx*)PlayerCamera::GetSingleton();
 	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))++;
@@ -41,8 +41,8 @@ void HitStopThreadFunc(int duration, int sync) {
 	pCam->firstPersonFOV -= fovDiff;
 	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))--;
 	//CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleHitStopHelper"), UIMessage::kMessage_Close, nullptr);
-	HitStopThreadManager::gamePause_Lock.Leave();
 	HitStopThreadManager::running = false;
+	HitStopThreadManager::gamePause_Lock.Leave();
 	HitStopThreadManager::RequestLaunch();
 }
 

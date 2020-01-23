@@ -100,6 +100,7 @@ enum iConfigType {
 class ConfigManager {
 	static ConfigManager* instance;
 	static vector<Config> configs;
+	static vector<Config> physconfigs;
 	static CSimpleIniA ini;
 	static const char* filepath;
 public:

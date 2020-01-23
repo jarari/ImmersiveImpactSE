@@ -1,9 +1,13 @@
 #include "AddressManager.h"
 #include "MenuWatcher.h"
+#include "PhysicsManager.h"
 #include "StaggerTask.h"
 #include "Utils.h"
 #include <Psapi.h>
 #include <unordered_map>
+#include "HitEventTask.h"
+#include "WeaponSpeedManager.h"
+#include "ConfigManager.h"
 using std::unordered_map;
 
 std::string MenuWatcher::className = "MenuWatcher";
@@ -95,9 +99,18 @@ EventResult MenuWatcher::ReceiveEvent(MenuOpenCloseEvent* evn, EventDispatcher<M
 	UIManager* ui = UIManager::GetSingleton();
 	UIStringHolder* uistr = UIStringHolder::GetSingleton();
 	if (evn->menuName == uistr->loadingMenu) {
-		if (!evn->opening && !mm->IsMenuOpen(&BSFixedString("BingleStaggerHelper"))) {
-			CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleStaggerHelper"), UIMessage::kMessage_Open, nullptr);
-			_MESSAGE("Helper created");
+		if (!evn->opening) {
+			if (!mm->IsMenuOpen(&BSFixedString("BingleStaggerHelper"))) {
+				CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleStaggerHelper"), UIMessage::kMessage_Open, nullptr);
+				_MESSAGE("Helper created");
+			}
+		}
+		else if (evn->opening) {
+			ConfigManager::GetInstance()->LoadConfigs();
+			HitEventPool::ResetPool();
+			StaggerPool::ResetPool();
+			PhysicsManager::ResetPhysics();
+			WeaponSpeedManager::ResetRestraintChecker();
 		}
 	}
 	return kEvent_Continue;

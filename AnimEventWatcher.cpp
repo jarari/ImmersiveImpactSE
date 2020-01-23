@@ -1,5 +1,6 @@
 #include "AnimEventWatcher.h"
 #include "Utils.h"
+#include "PhysicsManager.h"
 #include "WeaponSpeedManager.h"
 #include <skse64\GameReferences.h>
 #include <inttypes.h>
@@ -46,6 +47,13 @@ EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, Event
 	}
 	else if (strcmp(evn->eventname, "attackStop") == 0) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
+	}
+	else if (strcmp(evn->eventname, "bashStop") == 0) {
+		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
+	}
+	else if (strcmp(evn->eventname, "staggerStop") == 0) {
+		PhysicsManager::SetFriction(a, 1.0f);
+		PhysicsManager::SetDrag(a, 1.0f);
 	}
 	FnReceiveEvent fn = fnHash.at(*(UInt64*)this);
 	return fn ? (this->*fn)(evn, dispatcher) : kEvent_Continue;

@@ -31,7 +31,7 @@ void HookDamageCalculation() {
 			push(rcx);
 			push(rdx);
 			push(r8);
-			sahf();
+			lahf();
 			lea(rsp, ptr[rsp - 0x80]);
 			mov(ptr[rsp + 0x40], r12);
 			mov(ptr[rsp + 0x50], r10);
@@ -53,7 +53,7 @@ void HookDamageCalculation() {
 			mov(r9, ptr[rsp + 0x60]);
 			mov(ah, ptr[rsp + 0x70]);
 			lea(rsp, ptr[rsp + 0x80]);
-			lahf();
+			sahf();
 			pop(r8);
 			pop(rdx);
 			pop(rcx);

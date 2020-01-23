@@ -14,20 +14,22 @@ StaggerTask* StaggerTask::Create(Actor* attacker, Actor* target, float dir, floa
 		cmd->target = target;
 		cmd->dir = dir;
 		cmd->mag = mag;
+		cmd->taskran = false;
 		cmd->counter = 0;
 	}
 	return cmd;
 }
 
-int framedelay = 6;
 void StaggerTask::Run() {
 	counter++;
-	if (counter < framedelay || counter > framedelay)
+	if (counter <= 2)
 		return;
+	bool isStaggering = false;
 	bool dontMove = false;//*(UInt32*)((UInt32)target->processManager + 0x5C) & 0x4 == 0x4;
 	bool isBleedingOut = false;
+	((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->GetAnimationVariableBool("IsStaggering", isStaggering);
 	((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->GetAnimationVariableBool("IsBleedingOut", isBleedingOut);
-	if (dontMove || isBleedingOut || !target ||
+	if ((isStaggering && counter < 9) || dontMove || isBleedingOut || !target ||
 		(attacker && ActorManager::IsInKillmove(attacker)) || //killmove
 		ActorManager::IsInKillmove(target) || //killmove
 		target->IsDead(1))
@@ -35,6 +37,7 @@ void StaggerTask::Run() {
 	SetAnimationVariableFloat(& target->animGraphHolder, "staggerDirection", dir);
 	SetAnimationVariableFloat(& target->animGraphHolder, "staggerMagnitude", mag);
 	((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->SendAnimationEvent("staggerStart");
+	taskran = true;
 }
 
 void StaggerTask::Dispose() {
@@ -52,7 +55,7 @@ void StaggerPool::AddTask(StaggerTask* t) {
 void StaggerPool::ProcessTasks() {
 	if (tasks.size() == 0) return;
 	for (list<StaggerTask*>::iterator it = tasks.begin(); it != tasks.end(); it++) {
-		if ((*it)->counter < framedelay) {
+		if (!(*it)->taskran) {
 			(*it)->Run();
 		}
 		else {

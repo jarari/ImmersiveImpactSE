@@ -1,5 +1,6 @@
 #include "AnimEventWatcher.h"
 #include "AddressManager.h"
+#include "CharacterMoveEventWatcher.h"
 #include "ObjectLoadWatcher.h"
 #include "Utils.h"
 #include <skse64\GameReferences.h>
@@ -17,6 +18,7 @@ void ObjectLoadWatcher::InitWatcher() {
 
 bool ActorHooked = false;
 bool CharacterHooked = false;
+bool PlayerCharacterHooked = false;
 EventResult ObjectLoadWatcher::ReceiveEvent(TESObjectLoadedEvent* evn, EventDispatcher<TESObjectLoadedEvent>* src) {
 	TESForm* form = LookupFormByID(evn->formId);
 	if (form && evn->loaded) {
@@ -24,14 +26,20 @@ EventResult ObjectLoadWatcher::ReceiveEvent(TESObjectLoadedEvent* evn, EventDisp
 		Character* _c = dynamic_cast<Character*>(form);
 		PlayerCharacter* _p = dynamic_cast<PlayerCharacter*>(form);
 		if (_c && !_p && !CharacterHooked) {
-			TESFullName* pname = DYNAMIC_CAST(((Actor*)form)->baseForm, TESForm, TESFullName);
-			const char* name;
-			if (pname)
-				name = pname->name.data;
-			_MESSAGE("Character Ptr : %llx, Name : %s", form, name);
+			_MESSAGE("Character Ptr : %llx, Name : %s", form, Utils::GetName(((Actor*)form)->baseForm));
 			AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&((Actor*)form)->animGraphEventSink);
 			ae->HookSink();
+			CharacterMoveEventWatcher* cme = (CharacterMoveEventWatcher*)(&((Actor*)form)->characterMoveFinishEvent);
+			cme->HookSink();
 			CharacterHooked = true;
+		}
+		else if (_p && !PlayerCharacterHooked) {
+			_MESSAGE("PlayerCharacter Ptr : %llx, Name : %s", form, Utils::GetName(((Actor*)form)->baseForm));
+			AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&((Actor*)form)->animGraphEventSink);
+			ae->HookSink();
+			CharacterMoveEventWatcher* cme = (CharacterMoveEventWatcher*)(&((Actor*)form)->characterMoveFinishEvent);
+			cme->HookSink();
+			PlayerCharacterHooked = true;
 		}
 		/*else if (_a && !_c && !ActorHooked) {
 			TESFullName* pname = DYNAMIC_CAST(((Actor*)form)->baseForm, TESForm, TESFullName);
@@ -43,7 +51,7 @@ EventResult ObjectLoadWatcher::ReceiveEvent(TESObjectLoadedEvent* evn, EventDisp
 			ae->HookSink();
 			ActorHooked = true;
 		}*/
-		if (CharacterHooked)
+		if (CharacterHooked && PlayerCharacterHooked)
 			RemoveWatcher();
 	}
 	return kEvent_Continue;

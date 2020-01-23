@@ -1,8 +1,10 @@
 #include "ConfigManager.h"
 #include "HitEventWatcher.h"
+#include "PhysicsManager.h"
 
 ConfigManager* ConfigManager::instance = nullptr;
 vector<Config> ConfigManager::configs = vector<Config>();
+vector<Config> ConfigManager::physconfigs = vector<Config>();
 CSimpleIniA ConfigManager::ini(true, false, false);
 const char* ConfigManager::filepath = "Data\\SKSE\\Plugins\\ImmersiveImpactSE.ini";
 
@@ -91,6 +93,11 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("HitBlur_1H_Duration", 0.25f));
 	configs.push_back(Config("HitBlur_2H", 0.5f));
 	configs.push_back(Config("HitBlur_2H_Duration", 0.35f));
+
+	physconfigs.clear();
+	physconfigs.push_back(Config("Tick", 0.030f));
+	physconfigs.push_back(Config("Friction", 1.0f));
+	physconfigs.push_back(Config("AirDrag", 1.0f));
 }
 
 void ConfigManager::InitializeINI() {
@@ -98,6 +105,10 @@ void ConfigManager::InitializeINI() {
 	for (int i = 0; i < configs.size(); i++) {
 		sprintf_s(f2c, "%f", configs[i].value);
 		ini.SetValue("General", configs[i].name, f2c);
+	}
+	for (int i = 0; i < physconfigs.size(); i++) {
+		sprintf_s(f2c, "%f", physconfigs[i].value);
+		ini.SetValue("Phys", physconfigs[i].name, f2c);
 	}
 	ini.SaveFile(filepath, false);
 	SI_Error error = ini.LoadFile(filepath);
@@ -123,8 +134,12 @@ void ConfigManager::LoadConfigs() {
 	for (int i = 0; i < configs.size(); i++) {
 		sprintf_s(f2c, "%f", configs[i].value);
 		configs[i].value = std::stof(ini.GetValue("General", configs[i].name, f2c, NULL));
-		//_MESSAGE("Loaded config: %s value: %f", configs[i].name, configs[i].value);
 	}
+	for (int i = 0; i < physconfigs.size(); i++) {
+		sprintf_s(f2c, "%f", physconfigs[i].value);
+		physconfigs[i].value = std::stof(ini.GetValue("Phys", physconfigs[i].name, f2c, NULL));
+	}
+	PhysData::tick = physconfigs[0].value;
 }
 
 void ConfigManager::UpdateINIWithCurrentValues() {
@@ -132,6 +147,10 @@ void ConfigManager::UpdateINIWithCurrentValues() {
 	for (int i = 0; i < configs.size(); i++) {
 		sprintf_s(f2c, "%f", configs[i].value);
 		ini.SetValue("General", configs[i].name, f2c);
+	}
+	for (int i = 0; i < physconfigs.size(); i++) {
+		sprintf_s(f2c, "%f", physconfigs[i].value);
+		ini.SetValue("Phys", physconfigs[i].name, f2c);
 	}
 	ini.SaveFile(filepath, false);
 }

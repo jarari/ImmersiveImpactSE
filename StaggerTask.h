@@ -12,12 +12,13 @@ public:
 	static StaggerTask* Create(Actor* attcker, Actor* target, float dir, float mag);
 	virtual void Run();
 	virtual void Dispose();
-	int counter;
+	bool taskran;
 private:
 	Actor* attacker;
 	Actor* target;
 	float dir;
 	float mag;
+	int counter;
 };
 
 class StaggerPool {

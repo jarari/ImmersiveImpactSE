@@ -3,6 +3,7 @@
 #include "ConfigManager.h"
 #include "HitEventTask.h"
 #include "ModifiedSKSE.h"
+#include "PhysicsManager.h"
 #include "StaggerTask.h"
 #include <common\IMemPool.h>
 #include <skse64\GameReferences.h>
@@ -55,8 +56,18 @@ void HitEventTask::Run() {
 			staggerDir += 1.0f;
 		StaggerTask* cmd = StaggerTask::Create(attacker, target, staggerDir, staggerMagnitude);
 		if (cmd) {
+			((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->SendAnimationEvent("attackStop");
 			((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->SendAnimationEvent("staggerStop");
 			StaggerPool::AddTask(cmd);
+
+			PhysicsManager::SetFriction(target, 0.01f);
+			PhysicsManager::SetDrag(target, 0.01f);
+			hkVector4 vel = hkVector4(target->pos - attacker->pos);
+			vel.z = -1;
+			vel.Normalize();
+			if (ae->magnitude + 1 == ConfigManager::GetConfig()[iConfigType::StaggerLimit].value)
+				vel *= 5.0f;
+			PhysicsManager::AddVelocity(target, vel * 50.0f);
 		}
 	}
 	float mulIfDagger = wepType == TESObjectWEAP::GameData::kType_OneHandDagger || wepType == TESObjectWEAP::GameData::kType_1HD ? 0.75f : 1.0f;

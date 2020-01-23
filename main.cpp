@@ -7,6 +7,7 @@
 #include "HitStopManager.h"
 #include "MenuWatcher.h"
 #include "ObjectLoadWatcher.h"
+#include "PhysicsManager.h"
 #include "StaggerTask.h"
 #include "WeaponSpeedManager.h"
 #include <common\IDebugLog.h>
@@ -60,13 +61,7 @@ extern "C" {
 		ConfigManager* cm = new ConfigManager();
 		g_message = (SKSEMessagingInterface*) skse->QueryInterface(kInterface_Messaging);
 		g_message->RegisterListener(skse->GetPluginHandle(), "SKSE", [](SKSEMessagingInterface::Message* msg) -> void {
-			if (msg->type == SKSEMessagingInterface::kMessage_PreLoadGame || msg->type == SKSEMessagingInterface::kMessage_NewGame) {
-				HitEventPool::ResetPool();
-				StaggerPool::ResetPool();
-				ConfigManager::GetInstance()->LoadConfigs();
-				WeaponSpeedManager::ResetRestraintChecker();
-			}
-			else if (msg->type == SKSEMessagingInterface::kMessage_DataLoaded) {
+			if (msg->type == SKSEMessagingInterface::kMessage_DataLoaded) {
 				ConfigManager::GetInstance()->LoadConfigs();
 				ConfigManager::GetInstance()->UpdateINIWithCurrentValues();
 				AddressManager* am = new AddressManager();
@@ -79,8 +74,7 @@ extern "C" {
 				MenuWatcher::InitWatcher();
 				HitEventWatcher::InitWatcher();
 				ObjectLoadWatcher::InitWatcher();
-				AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&(*g_thePlayer)->animGraphEventSink);
-				ae->HookSink();
+				PhysicsManager::HookOnGroundVelocity();
 				_MESSAGE("Player : %llx", *g_thePlayer);
 			}
 		});

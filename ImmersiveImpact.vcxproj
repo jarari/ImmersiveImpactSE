@@ -22,6 +22,7 @@
     <ClCompile Include="ActorManager.cpp" />
     <ClCompile Include="AddressManager.cpp" />
     <ClCompile Include="AnimEventWatcher.cpp" />
+    <ClCompile Include="CharacterMoveEventWatcher.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="HitEventTask.cpp" />
     <ClCompile Include="HitEventWatcher.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MenuWatcher.cpp" />
     <ClCompile Include="ObjectLoadWatcher.cpp" />
+    <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="StaggerTask.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="WeaponSpeedManager.cpp" />
@@ -51,6 +53,7 @@
     <ClInclude Include="ActorManager.h" />
     <ClInclude Include="AddressManager.h" />
     <ClInclude Include="AnimEventWatcher.h" />
+    <ClInclude Include="CharacterMoveEventWatcher.h" />
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="HitEventTask.h" />
     <ClInclude Include="HitEventWatcher.h" />
@@ -60,6 +63,7 @@
     <ClInclude Include="ModifiedSKSE.h" />
     <ClInclude Include="ObjectLoadWatcher.h" />
     <ClInclude Include="PatternScanner.h" />
+    <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="StaggerTask.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="WeaponSpeedManager.h" />
