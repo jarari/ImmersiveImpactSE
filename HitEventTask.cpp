@@ -60,14 +60,18 @@ void HitEventTask::Run() {
 			((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->SendAnimationEvent("staggerStop");
 			StaggerPool::AddTask(cmd);
 
-			PhysicsManager::SetFriction(target, 0.05f);
-			PhysicsManager::SetDrag(target, 0.05f);
 			hkVector4 vel = hkVector4(target->pos - attacker->pos);
-			vel.z = -1;
+			vel.z = 0;
 			vel.Normalize();
-			if (ae->magnitude + 1 == ConfigManager::GetConfig()[iConfigType::StaggerLimit].value)
-				vel *= 5.0f;
-			PhysicsManager::AddVelocity(target, vel * 10.0f);
+			vel.z += 0.25f;
+			PhysicsManager::AddVelocity(target, vel * 50.0f);
+			/*if (ae->magnitude + 1 == ConfigManager::GetConfig()[iConfigType::StaggerLimit].value) {
+				PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / 20.0f);
+			}
+			else {
+				PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / 2.0f);
+			}
+			PhysicsManager::AddVelocity(target, vel * 20.0f);*/
 		}
 	}
 	float mulIfDagger = wepType == TESObjectWEAP::GameData::kType_OneHandDagger || wepType == TESObjectWEAP::GameData::kType_1HD ? 0.75f : 1.0f;

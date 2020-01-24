@@ -5,7 +5,7 @@
 #include <xbyak\xbyak.h>
 
 float PhysicsManager::defaultFriction = 0.5f;
-float PhysicsManager::defaultDrag = 0.025f;
+float PhysicsManager::defaultDrag = 1.0f;
 
 PhysData* PhysicsManager::ShouldOverrideVelocity(bhkCharacterController* cCon) {
 	Actor* a = (Actor*)(**(UInt64 **)((UInt64)cCon + 0x10) - 0xD0);
@@ -135,11 +135,15 @@ bool PhysicsManager::Simulate(Actor* a) {
 		float dt_t = min(dt / 6944.4f, 1.1f);
 		float len = vel.Length();
 		hkVector4 friction = vel * -1.0f * (float)onGround * pd->friction * dt_t;
+		friction.z = 0.0f;
 		hkVector4 drag = vel;
 		drag.Normalize();
-		drag *= hkVector4(1.0f, 1.0f, 0.01f) * -1.0f * len * len * ((float)inWater + 1.0f) * pd->airdrag * dt_t;
+		drag *= hkVector4(1.0f, 1.0f, 0.01f) * -0.025f * len * len * ((float)inWater + 1.0f) * pd->airdrag * dt_t;
 
 		vel += pd->velocity;
+		if (vel.z > 0) {
+			*(UInt32*)((UInt64)controller + 0x200) = 1;
+		}
 		pd->velocity = hkVector4();
 		SetVelocity(controller, vel + friction + drag);
 

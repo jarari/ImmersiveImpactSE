@@ -66,10 +66,10 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 			if (ConfigManager::GetConfig()[iConfigType::EnableDash].value && !ActorManager::IsInKillmove(a)) {
 				NiPoint3 fwd;
 				Utils::GetRefForward(-a->rot.x, -a->rot.z, 0, &fwd);
-				fwd *= 10.0f;
+				fwd *= 20.0f;
 				//ActorManager::TranslateTo(a, a->pos.x + fwd.x, a->pos.y + fwd.y, a->pos.z + fwd.z, a->rot.x, a->rot.y, a->rot.z, 500, 0);
 				PhysicsManager::AddVelocity((Character*)a, hkVector4(fwd));
-				PhysicsManager::SetFriction((Character*)a, 0.1f);
+				PhysicsManager::SetFriction((Character*)a, 0.75f);
 				PhysicsManager::SetDrag((Character*)a, 0.0f);
 			}
 		}

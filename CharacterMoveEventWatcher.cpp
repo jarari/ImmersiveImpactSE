@@ -17,11 +17,12 @@ void CharacterMoveEventWatcher::HookSink() {
 }
 
 EventResult CharacterMoveEventWatcher::ReceiveEventHook(bhkCharacterMoveFinishEvent* evn, EventDispatcher<bhkCharacterMoveFinishEvent>* dispatcher) {
-	Character* c = (Character*)((UInt64)this - 0xD0);
-	if (c && c->loadedState && c->loadedState->node && !c->IsDead(1)) {
-		if (!PhysicsManager::Simulate(c)) {
-			PhysicsManager::InitializeData(c);
+	Actor* a = (Actor*)((UInt64)this - 0xD0);
+	if (a && a->loadedState && a->loadedState->node && !a->IsDead(1)) {
+		if (!PhysicsManager::Simulate(a)) {
+			PhysicsManager::InitializeData(a);
 		}
+		PhysicsManager::AddVelocity(a, hkVector4(0, 0, 50.0f));
 	}
 
 	FnReceiveEvent fn = fnHash.at(*(UInt64*)this);
