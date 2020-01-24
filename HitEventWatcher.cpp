@@ -129,6 +129,8 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 		 || wep->type() == TESObjectWEAP::GameData::kType_CrossBow
 		 || wep->type() == TESObjectWEAP::GameData::kType_CBow)
 		&& !bash) {
+		if (ConfigManager::GetConfig()[iConfigType::StaggerIgnoreArrow].value)
+			return kEvent_Continue;
 		isArrow = true;
 		ae->duration += 1.0f;
 	}
