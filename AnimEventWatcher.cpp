@@ -47,6 +47,9 @@ EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, Event
 	else if (strcmp(evn->eventname, "attackStop") == 0) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
 	}
+	else if (strcmp(evn->eventname, "bashStop") == 0) {
+		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
+	}
 	FnReceiveEvent fn = fnHash.at(*(UInt64*)this);
 	return fn ? (this->*fn)(evn, dispatcher) : kEvent_Continue;
 }
