@@ -24,6 +24,7 @@ BSFixedString winstart = BSFixedString("AttackWinStart");
 BSFixedString winstartl = BSFixedString("AttackWinStartLeft");
 BSFixedString attackstop = BSFixedString("attackStop");
 BSFixedString bashstop = BSFixedString("bashStop");
+BSFixedString staggerstop = BSFixedString("staggerStop");
 EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, EventDispatcher<BSAnimationGraphEvent>* dispatcher) {
 	Actor* a = *(Actor * *)((UInt64)evn + 0x8);
 	/*if(a == *g_thePlayer)
@@ -59,10 +60,7 @@ EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, Event
 	else if (evn->eventname == bashstop) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
 	}
-	else if (strcmp(evn->eventname, "bashStop") == 0) {
-		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
-	}
-	else if (strcmp(evn->eventname, "staggerStop") == 0) {
+	else if (evn->eventname == staggerstop) {
 		PhysicsManager::SetFriction(a, PhysicsManager::defaultFriction);
 		PhysicsManager::SetDrag(a, PhysicsManager::defaultDrag);
 	}
