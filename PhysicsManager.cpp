@@ -4,7 +4,7 @@
 #include <skse64_common\SafeWrite.h>
 #include <xbyak\xbyak.h>
 
-float PhysicsManager::defaultFriction = 0.5f;
+float PhysicsManager::defaultFriction = 0.9f;
 float PhysicsManager::defaultDrag = 1.0f;
 
 PhysData* PhysicsManager::ShouldOverrideVelocity(bhkCharacterController* cCon) {
@@ -71,6 +71,9 @@ void PhysicsManager::HookOnGroundVelocity() {
 	SafeWrite8(ptr_FrictionOverridePoint, 0x90);
 	SafeWrite8(ptr_FrictionOverridePoint + 1, 0x90);
 	SafeWrite8(ptr_FrictionOverridePoint + 2, 0x90);
+
+	SafeWrite8(ptr_OnGroundVelocityOverridePoint, 0x90);
+	SafeWrite8(ptr_OnGroundVelocityOverridePoint + 1, 0xE9);
 }
 
 int PhysData::tick = 30;
@@ -132,20 +135,17 @@ bool PhysicsManager::Simulate(Actor* a) {
 		hkVector4 vel;
 		GetVelocity(controller, vel);
 
-		float dt_t = min(dt / 6944.4f, 1.1f);
+		float dt_t = dt / 16666.6667f;
 		float len = vel.Length();
-		hkVector4 friction = vel * -1.0f * (float)onGround * pd->friction * dt_t;
+		hkVector4 friction = vel * -1.0f * (float)onGround * pd->friction;
 		friction.z = 0.0f;
 		hkVector4 drag = vel;
 		drag.Normalize();
-		drag *= hkVector4(1.0f, 1.0f, 0.01f) * -0.025f * len * len * ((float)inWater + 1.0f) * pd->airdrag * dt_t;
+		drag *= hkVector4(1.0f, 1.0f, 0.1f) * -0.5f * len * len * ((float)inWater + 1.0f) * pd->airdrag * dt / 60000000.0f;
 
 		vel += pd->velocity;
-		if (vel.z > 0) {
-			*(UInt32*)((UInt64)controller + 0x200) = 1;
-		}
 		pd->velocity = hkVector4();
-		SetVelocity(controller, vel + friction + drag);
+		SetVelocity(controller, (vel + friction + drag) * dt_t);
 
 		pd->lastRun = std::chrono::system_clock::now();
 	}
@@ -158,4 +158,10 @@ void PhysicsManager::InitializeData(Actor* a) {
 
 void PhysicsManager::ResetPhysics() {
 	datamap.clear();
+}
+
+void PhysicsManager::ResetTimer() {
+	for (unordered_map<UInt64, PhysData>::iterator it = datamap.begin(); it != datamap.end(); it++) {
+		it->second.lastRun = std::chrono::system_clock::now();
+	}
 }

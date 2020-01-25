@@ -140,4 +140,5 @@ namespace PhysicsManager {
 	bool Simulate(Actor* a);
 	void InitializeData(Actor* c);
 	void ResetPhysics();
+	void ResetTimer();
 }
