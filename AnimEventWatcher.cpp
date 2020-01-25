@@ -15,13 +15,13 @@ void AnimEventWatcher::HookSink() {
 			 *(UInt64*)this + 0x8, &AnimEventWatcher::ReceiveEventHook, fn);
 }
 
-BSFixedString castokstop = BSFixedString("CastOKStop");
 BSFixedString prehit = BSFixedString("preHitFrame");
 BSFixedString swing = BSFixedString("weaponSwing");
 BSFixedString swingl = BSFixedString("weaponLeftSwing");
 BSFixedString hit = BSFixedString("HitFrame");
 BSFixedString winstart = BSFixedString("AttackWinStart");
 BSFixedString winstartl = BSFixedString("AttackWinStartLeft");
+BSFixedString attackstop = BSFixedString("attackStop");
 BSFixedString bashstop = BSFixedString("bashStop");
 EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, EventDispatcher<BSAnimationGraphEvent>* dispatcher) {
 	Actor* a = *(Actor * *)((UInt64)evn + 0x8);
@@ -31,11 +31,8 @@ EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, Event
 		std::string compare = "PowerAttack_Start_end";
 		compare[18] = evn->eventname[18];
 		if (evn->eventname == BSFixedString(compare.c_str())) {
-			WeaponSpeedManager::EvaluateEvent(a, iSwingState::PrePre);
+			WeaponSpeedManager::EvaluateEvent(a, iSwingState::PrePre, true);
 		}
-	}
-	else if (evn->eventname == castokstop) {
-		WeaponSpeedManager::EvaluateEvent(a, iSwingState::PrePre);
 	}
 	else if (evn->eventname == prehit) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::Pre);
@@ -53,6 +50,9 @@ EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, Event
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
 	}
 	else if (evn->eventname == winstartl) {
+		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
+	}
+	else if (evn->eventname == attackstop) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
 	}
 	else if (evn->eventname == bashstop) {

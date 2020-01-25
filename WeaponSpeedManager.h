@@ -19,5 +19,5 @@ class Actor;
 namespace WeaponSpeedManager {
 	void ResetRestraintChecker();
 	void CompatibilityPatch();
-	void EvaluateEvent(Actor* a, int evn);
+	void EvaluateEvent(Actor* a, int evn, bool delayed = false);
 }

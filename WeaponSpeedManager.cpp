@@ -6,6 +6,8 @@
 #include "INILibrary\SimpleIni.h"
 #include <skse64\GameData.h>
 #include <skse64\PapyrusActor.h>
+#include <thread>
+using std::thread;
 
 static bool movementRestrained = false;
 static bool viewRestrained = false;
@@ -63,7 +65,14 @@ enum {
 };
 
 BSFixedString attackStart = BSFixedString("attackStart");
-void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
+void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn, bool delayed) {
+	if (delayed) {
+		thread t = thread([](Actor* a, int evn) -> void {
+			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+			EvaluateEvent(a, evn);
+		}, a, evn);
+		t.detach();
+	}
 	if (a == *g_thePlayer && a->actorState.IsWeaponDrawn()) {
 		if ((evn == iSwingState::PrePre && (a->actorState.flags04 & State_AttackStart) == State_AttackStart) || evn == iSwingState::Pre) {
 			if (ConfigManager::GetConfig()[iConfigType::RestrainMovement].value) {
@@ -132,14 +141,16 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 
 	bool powerAttack = false;
 	UInt64 unkprocess = (UInt64)a->processManager->unk10;
-	if (!unkprocess)
-		return;
-	UInt64 atkd = *(UInt64*)(unkprocess + 0x258);
-	if (!atkd)
-		return;
-	BSFixedString atkdstr = (const char*)(*(UInt64*)(atkd + 0x10));
-	if (atkdstr != attackStart)
-		powerAttack = true;
+	if (unkprocess) {
+		UInt64 atkd = *(UInt64*)(unkprocess + 0x258);
+		if (atkd) {
+			BSFixedString atkdstr = (const char*)(*(UInt64*)(atkd + 0x10));
+			if (atkdstr != attackStart)
+				powerAttack = true;
+		}
+	}
+	if (a == *g_thePlayer)
+		_MESSAGE("evn %i powerattack %i", evn, powerAttack);
 
 	float speed_r = ConfigManager::GetConfig()[weptype_r * 10 + evn + powerAttack * 5 + 1].value;
 	float speed_l = ConfigManager::GetConfig()[weptype_l * 10 + evn + powerAttack * 5 + 1].value;
