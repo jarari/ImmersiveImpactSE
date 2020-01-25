@@ -6,7 +6,7 @@ using std::unordered_map;
 
 class BSAnimationGraphEvent {
 public:
-	char* eventname;
+	const BSFixedString eventname;
 };
 
 class AnimEventWatcher : public BSTEventSink<BSAnimationGraphEvent> {

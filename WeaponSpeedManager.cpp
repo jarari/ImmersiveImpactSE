@@ -1,11 +1,14 @@
 #include "ActorManager.h"
 #include "ConfigManager.h"
+#include "ModifiedSKSE.h"
 #include "WeaponSpeedManager.h"
 #include "PhysicsManager.h"
 #include "Utils.h"
 #include "INILibrary\SimpleIni.h"
 #include <skse64\GameData.h>
 #include <skse64\PapyrusActor.h>
+#include <thread>
+using std::thread;
 
 static bool movementRestrained = false;
 static bool viewRestrained = false;
@@ -50,9 +53,29 @@ void WeaponSpeedManager::CompatibilityPatch() {
 	}
 }
 
-void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
+enum {
+	State_Sneak = 0x200,
+	State_AttackStart = 0x10000000,
+	State_AttackPre = 0x20000000,
+	State_AttackSwing = 0x30000000,
+	State_AttackPost = 0x40000000,
+	State_Bash = 0x60000000,
+	State_BowDrawStart = 0x80000000,
+	State_BowDraw = 0x90000000,
+	State_BowFullyDrawn = 0xA0000000
+};
+
+BSFixedString attackStart = BSFixedString("attackStart");
+void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn, bool delayed) {
+	if (delayed) {
+		thread t = thread([](Actor* a, int evn) -> void {
+			std::this_thread::sleep_for(std::chrono::milliseconds(250));
+			EvaluateEvent(a, evn);
+		}, a, evn);
+		t.detach();
+	}
 	if (a == *g_thePlayer && a->actorState.IsWeaponDrawn()) {
-		if (evn == iSwingState::PrePre || evn == iSwingState::Pre) {
+		if ((evn == iSwingState::PrePre && (a->actorState.flags04 & State_AttackStart) == State_AttackStart) || evn == iSwingState::Pre) {
 			if (ConfigManager::GetConfig()[iConfigType::RestrainMovement].value) {
 				ActorManager::RestrainPlayerMovement(true);
 				movementRestrained = true;
@@ -95,7 +118,8 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 			}
 		}
 	}
-	if (!ConfigManager::GetConfig()[iConfigType::EnableWeaponSpeed].value)
+	if (!ConfigManager::GetConfig()[iConfigType::EnableWeaponSpeed].value
+		|| (evn == iSwingState::PrePre && (a->actorState.flags04 & State_AttackStart) != State_AttackStart))
 		return;
 	float offset_r = 0;
 	float offset_l = 0;
@@ -123,8 +147,21 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn) {
 	int weptype_r = Utils::GetWeaponType(((TESObjectWEAP*)a->GetEquippedObject(false)));
 	int weptype_l = Utils::GetWeaponType(((TESObjectWEAP*)a->GetEquippedObject(true)));
 
-	float speed_r = ConfigManager::GetConfig()[weptype_r * 5 + evn + 1].value;
-	float speed_l = ConfigManager::GetConfig()[weptype_l * 5 + evn + 1].value;
+	bool powerAttack = false;
+	UInt64 unkprocess = (UInt64)a->processManager->unk10;
+	if (unkprocess) {
+		UInt64 atkd = *(UInt64*)(unkprocess + 0x258);
+		if (atkd) {
+			BSFixedString atkdstr = (const char*)(*(UInt64*)(atkd + 0x10));
+			if (atkdstr != attackStart)
+				powerAttack = true;
+		}
+	}
+	if (a == *g_thePlayer)
+		_MESSAGE("evn %i powerattack %i", evn, powerAttack);
+
+	float speed_r = ConfigManager::GetConfig()[weptype_r * 10 + evn + powerAttack * 5 + 1].value;
+	float speed_l = ConfigManager::GetConfig()[weptype_l * 10 + evn + powerAttack * 5 + 1].value;
 
 	if (weptype_r != iWepType::None)
 		ActorManager::SetCurrentAV(a, "WeaponSpeedMult", speed_r + offset_r);

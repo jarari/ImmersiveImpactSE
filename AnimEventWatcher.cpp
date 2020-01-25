@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include "PhysicsManager.h"
 #include "WeaponSpeedManager.h"
+#include <skse64\GameData.h>
 #include <skse64\GameReferences.h>
 #include <inttypes.h>
 
@@ -15,7 +16,14 @@ void AnimEventWatcher::HookSink() {
 			 *(UInt64*)this + 0x8, &AnimEventWatcher::ReceiveEventHook, fn);
 }
 
-
+BSFixedString prehit = BSFixedString("preHitFrame");
+BSFixedString swing = BSFixedString("weaponSwing");
+BSFixedString swingl = BSFixedString("weaponLeftSwing");
+BSFixedString hit = BSFixedString("HitFrame");
+BSFixedString winstart = BSFixedString("AttackWinStart");
+BSFixedString winstartl = BSFixedString("AttackWinStartLeft");
+BSFixedString attackstop = BSFixedString("attackStop");
+BSFixedString bashstop = BSFixedString("bashStop");
 EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, EventDispatcher<BSAnimationGraphEvent>* dispatcher) {
 	Actor* a = *(Actor * *)((UInt64)evn + 0x8);
 	/*if(a == *g_thePlayer)
@@ -23,29 +31,32 @@ EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, Event
 	if (strlen(evn->eventname) > 20){
 		std::string compare = "PowerAttack_Start_end";
 		compare[18] = evn->eventname[18];
-		if (strcmp(evn->eventname, compare.c_str()) == 0) {
-			WeaponSpeedManager::EvaluateEvent(a, iSwingState::PrePre);
+		if (evn->eventname == BSFixedString(compare.c_str())) {
+			WeaponSpeedManager::EvaluateEvent(a, iSwingState::PrePre, true);
 		}
 	}
-	else if (strcmp(evn->eventname, "preHitFrame") == 0) {
+	else if (evn->eventname == prehit) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::Pre);
 	}
-	else if (strcmp(evn->eventname, "weaponSwing") == 0) {
+	else if (evn->eventname == swing) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::Swing);
 	}
-	else if (strcmp(evn->eventname, "weaponLeftSwing") == 0) {
+	else if (evn->eventname == swingl) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::Swing);
 	}
-	else if (strcmp(evn->eventname, "HitFrame") == 0) {
+	else if (evn->eventname == hit) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::Hit);
 	}
-	else if (strcmp(evn->eventname, "AttackWinStart") == 0) {
+	else if (evn->eventname == winstart) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
 	}
-	else if (strcmp(evn->eventname, "AttackWinStartLeft") == 0) {
+	else if (evn->eventname == winstartl) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
 	}
-	else if (strcmp(evn->eventname, "attackStop") == 0) {
+	else if (evn->eventname == attackstop) {
+		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
+	}
+	else if (evn->eventname == bashstop) {
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
 	}
 	else if (strcmp(evn->eventname, "bashStop") == 0) {
