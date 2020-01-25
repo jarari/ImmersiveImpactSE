@@ -22,7 +22,6 @@ EventResult CharacterMoveEventWatcher::ReceiveEventHook(bhkCharacterMoveFinishEv
 		if (!PhysicsManager::Simulate(a)) {
 			PhysicsManager::InitializeData(a);
 		}
-		PhysicsManager::AddVelocity(a, hkVector4(0, 0, 50.0f));
 	}
 
 	FnReceiveEvent fn = fnHash.at(*(UInt64*)this);
