@@ -157,8 +157,6 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn, bool delayed) {
 				powerAttack = true;
 		}
 	}
-	if (a == *g_thePlayer)
-		_MESSAGE("evn %i powerattack %i", evn, powerAttack);
 
 	float speed_r = ConfigManager::GetConfig()[weptype_r * 10 + evn + powerAttack * 5 + 1].value;
 	float speed_l = ConfigManager::GetConfig()[weptype_l * 10 + evn + powerAttack * 5 + 1].value;
