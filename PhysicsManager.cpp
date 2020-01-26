@@ -5,7 +5,7 @@
 #include <skse64_common\SafeWrite.h>
 #include <xbyak\xbyak.h>
 
-float PhysicsManager::defaultFriction = 0.9f;
+float PhysicsManager::defaultFriction = 0.75f;
 float PhysicsManager::defaultDrag = 1.0f;
 
 hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit) {
@@ -39,9 +39,6 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 			}
 		}
 		float falltime = *(float*)((UInt64)cCon + 0x244);
-		_MESSAGE("Local vel\t\t%f %f %f", currLocal.x, currLocal.y, currLocal.z);
-		_MESSAGE("Max vel\t\t\t%f %f %f", limit.x, limit.y, limit.z);
-		_MESSAGE("Add\t\t\t\t%f %f %f", mult.x * limit.x, mult.y * limit.y, mult.z * limit.z);
 		return mult / (falltime + 1.0f);
 	}
 	return hkVector4(1, 1, 1);
@@ -175,7 +172,7 @@ bool PhysicsManager::Simulate(Actor* a) {
 
 		vel += pd->velocity;
 		pd->velocity = hkVector4();
-		pd->currentVelocity = (vel + friction + drag) * dt_t;
+		pd->currentVelocity = vel + (friction + drag) * dt_t;
 		SetVelocity(controller, pd->currentVelocity);
 
 		pd->lastRun = std::chrono::system_clock::now();
