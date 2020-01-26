@@ -197,7 +197,7 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 		//float damage = (damageBase + arrowDamage) * (1.0f - (armorValue * 0.12f + 0.03f * armorPieces));
 		float armorCap = ConfigManager::GetConfig()[iConfigType::StaggerArmorCap].value;
 		float staggerMul = min(powerattack + bash + 1.0f, 2.0f) / (powf(min(armorCap, armorValue) / armorCap, 1.5) * 3.0f + 1.0f);
-		HitEventTask* cmd = HitEventTask::Create(target, attacker, ae, staggerMul, isArrow, wep->type());
+		HitEventTask* cmd = HitEventTask::Create(target, attacker, ae, staggerMul, isArrow, Utils::GetWeaponType(wep));
 		if (cmd) {
 			HitEventPool::AddTask(cmd);
 		}
