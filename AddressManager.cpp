@@ -15,6 +15,7 @@ uintptr_t ptr_ApplyImageSpaceModifier;
 uintptr_t ptr_VelocityInjectionPoint;
 uintptr_t ptr_FrictionOverridePoint;
 uintptr_t ptr_OnGroundVelocityOverridePoint;
+uintptr_t ptr_AccelerationOverridePoint;
 
 _SendNotification SendNotification_Fn;
 _Play_Native Play_Native;
@@ -85,6 +86,9 @@ void AddressManager::FindAddresses() {
 
 	ptr_OnGroundVelocityOverridePoint = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0x0F, 0x28, 0x33, 0x0F, 0x28, 0xEE}) - 0x54;
 	_MESSAGE("On Ground Velocity Override Point %llx", ptr_OnGroundVelocityOverridePoint);
+
+	ptr_AccelerationOverridePoint = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0xF3, 0x0F, 0x59, 0xF8, 0xF3, 0x0F, 0x11, 0xBE});
+	_MESSAGE("Acceleration Override Point %llx", ptr_AccelerationOverridePoint);
 
 	delete(mr);
 }

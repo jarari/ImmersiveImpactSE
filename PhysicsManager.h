@@ -108,6 +108,9 @@ public:
 		this->z /= l;
 		return *this;
 	}
+	operator NiPoint3() {
+		return NiPoint3(x, y, z);
+	}
 };
 
 class bhkCharacterController;
@@ -117,6 +120,7 @@ struct PhysData {
 	float airdrag;
 	std::chrono::system_clock::time_point lastRun;
 	hkVector4 velocity;
+	hkVector4 currentVelocity;
 	PhysData() {
 		lastRun = std::chrono::system_clock::now();
 		velocity = hkVector4();
@@ -131,7 +135,7 @@ namespace PhysicsManager {
 	extern float defaultFriction;
 	extern float defaultDrag;
 	static unordered_map<UInt64, PhysData> datamap;
-	PhysData* ShouldOverrideVelocity(bhkCharacterController* cCon);
+	hkVector4 GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit);
 	void HookOnGroundVelocity();
 	PhysData* GetData(Actor* a);
 	void AddVelocity(Actor* a, hkVector4 vel);

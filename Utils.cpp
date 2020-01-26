@@ -63,7 +63,7 @@ void Utils::SetMatrix33(float a, float b, float c, float d, float e, float f, fl
 	mat.data[2][2] = i;
 }
 
-void Utils::GetRefForward(float pitch, float yaw, float roll, NiPoint3* vec) {
+NiMatrix33 Utils::GetRotationMatrix33(float pitch, float yaw, float roll) {
 	NiMatrix33 m_yaw;
 	SetMatrix33(cos(yaw), -sin(yaw), 0,
 				sin(yaw), cos(yaw), 0,
@@ -79,10 +79,111 @@ void Utils::GetRefForward(float pitch, float yaw, float roll, NiPoint3* vec) {
 				0, 1, 0,
 				-sin(pitch), 0, cos(pitch),
 				m_pitch);
-	NiPoint3 fwd = m_yaw * m_pitch * m_roll * NiPoint3(0, 1, 0);
+	return m_yaw * m_pitch * m_roll;
+}
+
+NiMatrix33 Utils::GetRotationMatrix33(NiPoint3 axis, float angle) {
+	float x = axis.x * sin(angle / 2.0f);
+	float y = axis.y * sin(angle / 2.0f);
+	float z = axis.z * sin(angle / 2.0f);
+	float w = cos(angle / 2.0f);
+	Quaternion q = Quaternion(x, y, z, w);
+	return q.ToRotationMatrix33();
+}
+
+//Sarrus rule
+float Utils::Determinant(NiMatrix33 mat) {
+	return mat.data[0][0] * mat.data[1][1] * mat.data[2][2]
+		+ mat.data[0][1] * mat.data[1][2] * mat.data[2][0]
+		+ mat.data[0][2] * mat.data[1][0] * mat.data[2][1]
+		- mat.data[0][2] * mat.data[1][1] * mat.data[2][0]
+		- mat.data[0][1] * mat.data[1][0] * mat.data[2][2]
+		- mat.data[0][0] * mat.data[1][2] * mat.data[2][1];
+}
+
+NiMatrix33 Utils::Inverse(NiMatrix33 mat) {
+	float det = Determinant(mat);
+	if (det == 0) {
+		NiMatrix33 idmat;
+		idmat.Identity();
+		return idmat;
+	}
+	float a = mat.data[0][0];
+	float b = mat.data[0][1];
+	float c = mat.data[0][2];
+	float d = mat.data[1][0];
+	float e = mat.data[1][1];
+	float f = mat.data[1][2];
+	float g = mat.data[2][0];
+	float h = mat.data[2][1];
+	float i = mat.data[2][2];
+	NiMatrix33 invmat;
+	SetMatrix33(e * i - f * h, -(b * i - c * h), b * f - c * e,
+				-(d * i - f * g), a * i - c * g, -(a * f - c * d),
+				d * h - e * g, -(a * h - b * g), a * e - b * d,
+				invmat);
+	return invmat * (1.0f / det);
+}
+
+//(Rotation Matrix)^-1 * (World pos - Local Origin)
+NiPoint3 Utils::WorldToLocal(NiPoint3 wpos, NiPoint3 lorigin, NiMatrix33 rot) {
+	NiPoint3 lpos = wpos - lorigin;
+	NiMatrix33 invrot = Inverse(rot);
+	return invrot * lpos;
+}
+
+NiPoint3 Utils::LocalToWorld(NiPoint3 lpos, NiPoint3 lorigin, NiMatrix33 rot) {
+	return rot * lpos + lorigin;
+}
+
+void Utils::GetRefForward(float pitch, float yaw, float roll, NiPoint3* vec) {
+	NiPoint3 fwd = GetRotationMatrix33(pitch, yaw, roll) * NiPoint3(0, 1, 0);
 	vec->x = fwd.x;
 	vec->y = fwd.y;
 	vec->z = fwd.z;
+}
+
+Quaternion::Quaternion(float _x, float _y, float _z, float _w) {
+	x = _x;
+	y = _y;
+	z = _z;
+	w = _w;
+}
+
+float Quaternion::Norm() {
+	return x * x + y * y + z * z + w * w;
+}
+
+//From https://android.googlesource.com/platform/external/jmonkeyengine/+/59b2e6871c65f58fdad78cd7229c292f6a177578/engine/src/core/com/jme3/math/Quaternion.java
+NiMatrix33 Quaternion::ToRotationMatrix33() {
+	float norm = Norm();
+	// we explicitly test norm against one here, saving a division
+	// at the cost of a test and branch.  Is it worth it?
+	float s = (norm == 1.0f) ? 2.0f : (norm > 0.0f) ? 2.0f / norm : 0;
+
+	// compute xs/ys/zs first to save 6 multiplications, since xs/ys/zs
+	// will be used 2-4 times each.
+	float xs = x * s;
+	float ys = y * s;
+	float zs = z * s;
+	float xx = x * xs;
+	float xy = x * ys;
+	float xz = x * zs;
+	float xw = w * xs;
+	float yy = y * ys;
+	float yz = y * zs;
+	float yw = w * ys;
+	float zz = z * zs;
+	float zw = w * zs;
+
+	// using s=2/norm (instead of 1/norm) saves 9 multiplications by 2 here
+	NiMatrix33 mat;
+	Utils::SetMatrix33(1 - (yy + zz), (xy - zw), (xz + yw),
+		(xy + zw), 1 - (xx + zz), (yz - xw),
+					   (xz - yw), (yz + xw), 1 - (xx + yy),
+					   mat);
+
+	return mat;
 }
 
 void Utils::SendNotification(const char* str) {

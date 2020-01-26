@@ -63,15 +63,14 @@ void HitEventTask::Run() {
 			hkVector4 vel = hkVector4(target->pos - attacker->pos);
 			vel.z = 0;
 			vel.Normalize();
-			vel.z += 0.25f;
-			PhysicsManager::AddVelocity(target, vel * 50.0f);
-			/*if (ae->magnitude + 1 == ConfigManager::GetConfig()[iConfigType::StaggerLimit].value) {
+			vel.z = 1.0f;
+			if (ae->magnitude + 1 == ConfigManager::GetConfig()[iConfigType::StaggerLimit].value) {
 				PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / 20.0f);
 			}
 			else {
 				PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / 2.0f);
 			}
-			PhysicsManager::AddVelocity(target, vel * 20.0f);*/
+			PhysicsManager::AddVelocity(target, vel * 500.0f);
 		}
 	}
 	float mulIfDagger = wepType == TESObjectWEAP::GameData::kType_OneHandDagger || wepType == TESObjectWEAP::GameData::kType_1HD ? 0.75f : 1.0f;

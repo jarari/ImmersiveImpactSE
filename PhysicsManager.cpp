@@ -1,5 +1,6 @@
 #include "AddressManager.h"
 #include "PhysicsManager.h"
+#include "Utils.h"
 #include <skse64_common\BranchTrampoline.h>
 #include <skse64_common\SafeWrite.h>
 #include <xbyak\xbyak.h>
@@ -7,73 +8,102 @@
 float PhysicsManager::defaultFriction = 0.9f;
 float PhysicsManager::defaultDrag = 1.0f;
 
-PhysData* PhysicsManager::ShouldOverrideVelocity(bhkCharacterController* cCon) {
+hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit) {
 	Actor* a = (Actor*)(**(UInt64 **)((UInt64)cCon + 0x10) - 0xD0);
 	if (datamap.count((UInt64)a)) {
 		PhysData* pd = GetData(a);
-		return pd;
+		hkVector4 currLocal = Utils::WorldToLocal(pd->currentVelocity, NiPoint3(), Utils::GetRotationMatrix33(-a->rot.x, -a->rot.z, 0));
+		hkVector4 mult = hkVector4(1, 1, 1);
+		if (limit.x != 0) {
+			if (currLocal.x * limit.x >= 0) { //same sign
+				mult.x = max(abs(limit.x) - abs(currLocal.x), 0) / abs(limit.x);
+			}
+			else {
+				mult.x = 1.0f;
+			}
+		}
+		if (limit.y != 0) {
+			if (currLocal.y * limit.y >= 0) {
+				mult.y = max(abs(limit.y) - abs(currLocal.y), 0) / abs(limit.y);
+			}
+			else {
+				mult.y = 1.0f;
+			}
+		}
+		if (limit.z != 0) {
+			if (currLocal.z * limit.z >= 0) {
+				mult.z = max(abs(limit.z) - abs(currLocal.z), 0) / abs(limit.z);
+			}
+			else {
+				mult.z = 1.0f;
+			}
+		}
+		float falltime = *(float*)((UInt64)cCon + 0x244);
+		_MESSAGE("Local vel\t\t%f %f %f", currLocal.x, currLocal.y, currLocal.z);
+		_MESSAGE("Max vel\t\t\t%f %f %f", limit.x, limit.y, limit.z);
+		_MESSAGE("Add\t\t\t\t%f %f %f", mult.x * limit.x, mult.y * limit.y, mult.z * limit.z);
+		return mult / (falltime + 1.0f);
 	}
-	return NULL;
+	return hkVector4(1, 1, 1);
 }
 
 void PhysicsManager::HookOnGroundVelocity() {
-	/*struct InstallHookOnGroundVelocity_Code : Xbyak::CodeGenerator {
-		InstallHookOnGroundVelocity_Code(void* buf, uintptr_t shouldOverride) : Xbyak::CodeGenerator(4096, buf) {
-			Xbyak::Label retn;
-
-			push(rax);
-			push(rcx);
-			push(rdx);
-			push(r8);
-			push(r9);
-			push(r10);
-			push(r11);
-			lahf();
-			sub(rsp, 8);	//align stack
-			lea(rsp, ptr[rsp - 0x100]);
-			mov(word[rsp + 0x90], ah);
-			movaps(qword[rsp + 0x40], xmm0);
-			mov(rcx, rsi);
-			mov(rax, shouldOverride);
-			call(rax);
-			test(rax, rax);
-			mov(dword[rbp - 0x60], 0x3f800000);
-			je(retn);
-			mov(ecx, ptr[rax]);
-			mov(dword[rbp - 0x60], ecx);
-
-			L(retn);
-			movaps(xmm0, qword[rsp + 0x40]);
-			mov(ah, word[rsp + 0x90]);
-			lea(rsp, ptr[rsp + 0x100]);
-			add(rsp, 8);
-			sahf();
-			pop(r11);
-			pop(r10);
-			pop(r9);
-			pop(r8);
-			pop(rdx);
-			pop(rcx);
-			pop(rax);
-			jmp(ptr[rip]);
-			dq(ptr_VelocityInjectionPoint + 0x7);
-		}
-	};
-	void* codeBuf = g_localTrampoline.StartAlloc();
-	InstallHookOnGroundVelocity_Code code(codeBuf, GetFnAddr(PhysicsManager::ShouldOverrideVelocity));
-	g_localTrampoline.EndAlloc(code.getCurr());
-
-	if (!g_branchTrampoline.Write5Branch(ptr_VelocityInjectionPoint, uintptr_t(code.getCode())))
-		return;
-	SafeWrite8(ptr_VelocityInjectionPoint + 5, 0x90);
-	SafeWrite8(ptr_VelocityInjectionPoint + 6, 0x90);*/
-
 	SafeWrite8(ptr_FrictionOverridePoint, 0x90);
 	SafeWrite8(ptr_FrictionOverridePoint + 1, 0x90);
 	SafeWrite8(ptr_FrictionOverridePoint + 2, 0x90);
 
 	SafeWrite8(ptr_OnGroundVelocityOverridePoint, 0x90);
 	SafeWrite8(ptr_OnGroundVelocityOverridePoint + 1, 0xE9);
+
+
+	struct InstallHookAcceleration_Code : Xbyak::CodeGenerator {
+		InstallHookAcceleration_Code(void* buf, uintptr_t getAccelMul) : Xbyak::CodeGenerator(4096, buf) {
+			Xbyak::Label retn;
+			mulss(xmm7, xmm0);	//x
+			mulss(xmm8, xmm0);	//y
+			mulss(xmm6, xmm0);	//z
+
+			push(rax);
+			push(rcx);
+			push(rdx);
+			push(r8);
+			push(r9);
+			lea(rsp, ptr[rsp - 0x78]);
+			movaps(ptr[rsp + 0x60], xmm1);
+			movaps(ptr[rsp + 0x70], xmm3);
+			movss(ptr[rsp + 0x50], xmm7);
+			movss(ptr[rsp + 0x54], xmm8);
+			movss(ptr[rsp + 0x58], xmm6);
+			lea(r8, ptr[rsp + 0x50]);
+			mov(rdx, rsi);
+			mov(rax, getAccelMul);
+			call(rax);
+			movaps(xmm1, ptr[rsp + 0x60]);
+			movaps(xmm3, ptr[rsp + 0x70]);
+			lea(rsp, ptr[rsp + 0x78]);
+			pop(r9);
+			pop(r8);
+			pop(rdx);
+			pop(rcx);
+			mulss(xmm7, dword[rax]);
+			mulss(xmm8, dword[rax + 0x4]);
+			mulss(xmm6, dword[rax + 0x8]);
+			pop(rax);
+
+			L(retn);
+			movss(ptr[rsi + 0xB0], xmm7);
+			movss(ptr[rsi + 0xB4], xmm8);
+			movss(ptr[rsi + 0xB8], xmm6);
+			jmp(ptr[rip]);
+			dq(ptr_AccelerationOverridePoint + 0x26);
+		}
+	};
+	void* codeBuf = g_localTrampoline.StartAlloc();
+	InstallHookAcceleration_Code code(codeBuf, GetFnAddr(PhysicsManager::GetAccelerationMultiplier));
+	g_localTrampoline.EndAlloc(code.getCurr());
+
+	if (!g_branchTrampoline.Write5Branch(ptr_AccelerationOverridePoint, uintptr_t(code.getCode())))
+		return;
 }
 
 int PhysData::tick = 30;
@@ -145,7 +175,8 @@ bool PhysicsManager::Simulate(Actor* a) {
 
 		vel += pd->velocity;
 		pd->velocity = hkVector4();
-		SetVelocity(controller, (vel + friction + drag) * dt_t);
+		pd->currentVelocity = (vel + friction + drag) * dt_t;
+		SetVelocity(controller, pd->currentVelocity);
 
 		pd->lastRun = std::chrono::system_clock::now();
 	}

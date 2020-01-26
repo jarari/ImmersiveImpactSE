@@ -9,6 +9,14 @@ class TESObjectREFR;
 class TESObjectWEAP;
 class TESSound;
 
+struct Quaternion {
+public:
+	float x, y, z, w;
+	Quaternion(float _x, float _y, float _z, float _w);
+	float Norm();
+	NiMatrix33 ToRotationMatrix33();
+};
+
 namespace Utils{
 	void Dump(void* mem, unsigned int size);
 	template<class Ty>
@@ -24,6 +32,12 @@ namespace Utils{
 	}
 	ActiveEffect* GetActiveEffectFromActor(Actor* actor, const char* name);
 	void SetMatrix33(float a, float b, float c, float d, float e, float f, float g, float h, float i, NiMatrix33& mat);
+	NiMatrix33 GetRotationMatrix33(float pitch, float yaw, float roll);
+	NiMatrix33 GetRotationMatrix33(NiPoint3 axis, float angle);
+	float Determinant(NiMatrix33 mat);
+	NiMatrix33 Inverse(NiMatrix33 mat);
+	NiPoint3 WorldToLocal(NiPoint3 wpos, NiPoint3 lorigin, NiMatrix33 rot);
+	NiPoint3 LocalToWorld(NiPoint3 lpos, NiPoint3 lorigin, NiMatrix33 rot);
 	void GetRefForward(float pitch, float yaw, float roll, NiPoint3* vec);
 	void SendNotification(const char* str);
 	UInt32 SoundPlay(TESSound* sound, TESObjectREFR* obj);
