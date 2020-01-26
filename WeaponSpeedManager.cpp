@@ -74,6 +74,10 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn, bool delayed) {
 		}, a, evn);
 		t.detach();
 	}
+
+	int weptype_r = Utils::GetWeaponType(((TESObjectWEAP*)a->GetEquippedObject(false)));
+	int weptype_l = Utils::GetWeaponType(((TESObjectWEAP*)a->GetEquippedObject(true)));
+
 	if (a == *g_thePlayer && a->actorState.IsWeaponDrawn()) {
 		if ((evn == iSwingState::PrePre && (a->actorState.flags04 & State_AttackStart) == State_AttackStart) || evn == iSwingState::Pre) {
 			if (ConfigManager::GetConfig()[iConfigType::RestrainMovement].value) {
@@ -86,11 +90,10 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn, bool delayed) {
 			}
 		}
 		else if (evn == iSwingState::Hit) {
-			if (ConfigManager::GetConfig()[iConfigType::EnableDash].value && !ActorManager::IsInKillmove(a)) {
+			if (ConfigManager::GetConfig()[iConfigType::EnableDash].value && weptype_r != iWepType::None && !ActorManager::IsInKillmove(a)) {
 				NiPoint3 fwd;
 				Utils::GetRefForward(-a->rot.x, -a->rot.z, 0, &fwd);
-				fwd *= 20.0f;
-				//ActorManager::TranslateTo(a, a->pos.x + fwd.x, a->pos.y + fwd.y, a->pos.z + fwd.z, a->rot.x, a->rot.y, a->rot.z, 500, 0);
+				fwd *= ConfigManager::GetConfig()[iConfigType::Dash_Fist + weptype_r].value;
 				PhysicsManager::AddVelocity((Character*)a, hkVector4(fwd));
 				PhysicsManager::SetFriction((Character*)a, 0.75f);
 				PhysicsManager::SetDrag((Character*)a, 0.0f);
@@ -144,8 +147,6 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn, bool delayed) {
 		}
 		++it;
 	}
-	int weptype_r = Utils::GetWeaponType(((TESObjectWEAP*)a->GetEquippedObject(false)));
-	int weptype_l = Utils::GetWeaponType(((TESObjectWEAP*)a->GetEquippedObject(true)));
 
 	bool powerAttack = false;
 	UInt64 unkprocess = (UInt64)a->processManager->unk10;

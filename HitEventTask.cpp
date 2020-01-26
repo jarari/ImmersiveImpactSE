@@ -5,6 +5,7 @@
 #include "ModifiedSKSE.h"
 #include "PhysicsManager.h"
 #include "StaggerTask.h"
+#include "WeaponSpeedManager.h"
 #include <common\IMemPool.h>
 #include <skse64\GameReferences.h>
 #define _USE_MATH_DEFINES
@@ -60,20 +61,21 @@ void HitEventTask::Run() {
 			((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->SendAnimationEvent("staggerStop");
 			StaggerPool::AddTask(cmd);
 
-			hkVector4 vel = hkVector4(target->pos - attacker->pos);
-			vel.z = 0;
-			vel.Normalize();
-			vel.z = 1.0f;
-			if (ae->magnitude + 1 == ConfigManager::GetConfig()[iConfigType::StaggerLimit].value) {
-				PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / 20.0f);
+			if (ConfigManager::GetConfig()[iConfigType::EnableKnockback].value) {
+				hkVector4 vel = hkVector4(target->pos - attacker->pos);
+				vel.z = 0;
+				vel.Normalize();
+				if (ae->magnitude + 1 == ConfigManager::GetConfig()[iConfigType::StaggerLimit].value) {
+					PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / 20.0f);
+				}
+				else {
+					PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / 2.0f);
+				}
+				PhysicsManager::AddVelocity(target, vel * ConfigManager::GetConfig()[iConfigType::Knockback_Fist + wepType].value);
 			}
-			else {
-				PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / 2.0f);
-			}
-			PhysicsManager::AddVelocity(target, vel * 500.0f);
 		}
 	}
-	float mulIfDagger = wepType == TESObjectWEAP::GameData::kType_OneHandDagger || wepType == TESObjectWEAP::GameData::kType_1HD ? 0.75f : 1.0f;
+	float mulIfDagger = wepType == iWepType::Dagger ? 0.75f : 1.0f;
 	ae->magnitude += 1 * mulIfDagger;
 }
 

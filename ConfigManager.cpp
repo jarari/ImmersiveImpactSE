@@ -68,7 +68,16 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("StaggerAny", 0));
 	configs.push_back(Config("StaggerArmorCap", 300.0f));
 	configs.push_back(Config("StaggerIgnoreArrow", 1));
+	configs.push_back(Config("EnableKnockback", 0));
+	configs.push_back(Config("Knockback_Fist", 30.0f));
+	configs.push_back(Config("Knockback_Dagger", 200.0f));
+	configs.push_back(Config("Knockback_1H", 30.0f));
+	configs.push_back(Config("Knockback_2H", 50.0f));
 	configs.push_back(Config("EnableDash", 0));
+	configs.push_back(Config("Dash_Fist", 20.0f));
+	configs.push_back(Config("Dash_Dagger", 15.0f));
+	configs.push_back(Config("Dash_1H", 20.0f));
+	configs.push_back(Config("Dash_2H", 30.0f));
 	configs.push_back(Config("EnableHitStop", 0));
 	configs.push_back(Config("HitStop_OnPlayerHit", 0));
 	configs.push_back(Config("HitStop_OnObjectHit", 0));
@@ -117,6 +126,8 @@ void ConfigManager::InitializeConfigDefaults() {
 
 	physconfigs.clear();
 	physconfigs.push_back(Config("Tick", 0.030f));
+	physconfigs.push_back(Config("DefaultFriction", 0.75f));
+	physconfigs.push_back(Config("DefaultAirDrag", 1.0f));
 }
 
 void ConfigManager::InitializeINI() {
@@ -159,6 +170,8 @@ void ConfigManager::LoadConfigs() {
 		physconfigs[i].value = std::stof(ini.GetValue("Phys", physconfigs[i].name, f2c, NULL));
 	}
 	PhysData::tick = physconfigs[0].value;
+	PhysicsManager::defaultFriction = physconfigs[1].value;
+	PhysicsManager::defaultDrag = physconfigs[2].value;
 }
 
 void ConfigManager::UpdateINIWithCurrentValues() {
