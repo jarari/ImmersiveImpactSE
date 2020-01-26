@@ -44,12 +44,6 @@ bool ActorManager::CanBeKnockdown(Actor* a) {
 	return !((a->race->data.raceFlags & TESRace::kRace_NoKnockdowns) == TESRace::kRace_NoKnockdowns);
 }
 
-void ActorManager::TranslateTo(Actor* a, float x, float y, float z, float pitch, float yaw, float roll, float vel, float angvel) {
-	VMClassRegistry* registry = (*g_skyrimVM)->GetClassRegistry();
-	if (!registry) return;
-	TranslateTo_Native(registry, 0, a, x, y, z, pitch, yaw, roll, vel, angvel);
-}
-
 void ActorManager::RestrainPlayerMovement(bool restrain) {
 	if (isRidingHorse(*g_thePlayer)) return;
 	*(bool*)((UInt64)PlayerControls::GetSingleton()->movementHandler + 0x8) = !restrain;

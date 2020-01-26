@@ -13,7 +13,6 @@ namespace ActorManager {
 	void deflectAttack(Actor* actor, ActiveEffect* ae, bool isArrow = false, bool playSound = true, float volume = 1.0f);
 	bool IsInKillmove(Actor* a);
 	bool CanBeKnockdown(Actor* a);
-	void TranslateTo(Actor* a, float x, float y, float z, float pitch, float yaw, float roll, float vel, float angvel);
 	void RestrainPlayerMovement(bool restrain);
 	void RestrainPlayerView(bool restrain);
 	static std::map<char*, UInt32> avPtrs;
