@@ -5,7 +5,6 @@ uintptr_t ptr_Notification;
 uintptr_t ptr_PlayNative;
 uintptr_t ptr_DamageInjectionPoint;
 uintptr_t ptr_SetAnimationVariableFloat;
-uintptr_t ptr_TranslateToNative;
 uintptr_t ptr_SetInstanceVolumeToNative;
 uintptr_t ptr_GodMode;
 uintptr_t ptr_UnknownDataHolder;
@@ -20,7 +19,6 @@ uintptr_t ptr_AccelerationOverridePoint;
 _SendNotification SendNotification_Fn;
 _Play_Native Play_Native;
 _SetAnimationVariableFloat SetAnimationVariableFloat;
-_TranslateTo_Native TranslateTo_Native;
 _SetInstanceVolume_Native SetInstanceVolume_Native;
 _ShakeController ShakeController;
 _ShakeCamera_Native ShakeCamera_Native;
@@ -47,10 +45,6 @@ void AddressManager::FindAddresses() {
 	ptr_SetAnimationVariableFloat = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0xF3, 0x0F, 0x11, 0x54, 0x24, 0x18, 0x48, 0x83, 0xEC, 0x28, 0x4C, 0x8D});
 	_MESSAGE("Function - SetAnimationVariableFloat %llx", ptr_SetAnimationVariableFloat);
 	SetAnimationVariableFloat = (_SetAnimationVariableFloat)ptr_SetAnimationVariableFloat;
-
-	ptr_TranslateToNative = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0x4D, 0x8B, 0xF0, 0x44, 0x8B, 0xE2, 0x4C, 0x8B, 0xF9}) - 0x32;
-	_MESSAGE("Function - TranslateTo (Native) %llx", ptr_TranslateToNative);
-	TranslateTo_Native = (_TranslateTo_Native)ptr_TranslateToNative;
 
 	ptr_SetInstanceVolumeToNative = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0xF3, 0x0F, 0x10, 0x4C, 0x24, 0x60, 0x48, 0x8D, 0x4C}) - 0x9;
 	_MESSAGE("Function - SetInstanceVolume (Native) %llx", ptr_SetInstanceVolumeToNative);

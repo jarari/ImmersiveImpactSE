@@ -9,7 +9,6 @@ extern uintptr_t ptr_Notification;
 extern uintptr_t ptr_PlayNative;
 extern uintptr_t ptr_DamageInjectionPoint;
 extern uintptr_t ptr_SetAnimationVariableFloat;
-extern uintptr_t ptr_TranslateToNative;
 extern uintptr_t ptr_SetInstanceVolumeToNative;
 extern uintptr_t ptr_GodMode;
 extern uintptr_t ptr_UnknownDataHolder;
@@ -29,9 +28,6 @@ extern _Play_Native Play_Native;
 
 typedef bool (*_SetAnimationVariableFloat)(IAnimationGraphManagerHolder* holder, const BSFixedString& name, float value);
 extern _SetAnimationVariableFloat SetAnimationVariableFloat;
-
-typedef void (*_TranslateTo_Native)(VMClassRegistry* registry, UInt32 stackId, TESObjectREFR* target, float x, float y, float z, float pitch, float yaw, float roll, float vel, float angvel);
-extern _TranslateTo_Native TranslateTo_Native;
 
 typedef void (*_SetInstanceVolume_Native)(VMClassRegistry* registry, UInt32 stackId, UInt32 instance, float volume);
 extern _SetInstanceVolume_Native SetInstanceVolume_Native;
