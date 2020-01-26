@@ -12,6 +12,8 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 	Actor* a = (Actor*)(**(UInt64 **)((UInt64)cCon + 0x10) - 0xD0);
 	if (datamap.count((UInt64)a)) {
 		PhysData* pd = GetData(a);
+		if (!pd)
+			return hkVector4(1, 1, 1);
 		hkVector4 currLocal = Utils::WorldToLocal(pd->currentVelocity, NiPoint3(), Utils::GetRotationMatrix33(0, -a->rot.z, 0));
 		hkVector4 mult = hkVector4(1, 1, 1);
 		if (limit.x != 0) {
@@ -55,7 +57,6 @@ void PhysicsManager::HookOnGroundVelocity() {
 
 	struct InstallHookAcceleration_Code : Xbyak::CodeGenerator {
 		InstallHookAcceleration_Code(void* buf, uintptr_t getAccelMul) : Xbyak::CodeGenerator(4096, buf) {
-			Xbyak::Label retn;
 			mulss(xmm7, xmm0);	//x
 			mulss(xmm8, xmm0);	//y
 			mulss(xmm6, xmm0);	//z
@@ -65,29 +66,36 @@ void PhysicsManager::HookOnGroundVelocity() {
 			push(rdx);
 			push(r8);
 			push(r9);
-			lea(rsp, ptr[rsp - 0x78]);
-			movaps(ptr[rsp + 0x60], xmm1);
-			movaps(ptr[rsp + 0x70], xmm3);
-			movss(ptr[rsp + 0x50], xmm7);
-			movss(ptr[rsp + 0x54], xmm8);
-			movss(ptr[rsp + 0x58], xmm6);
-			lea(r8, ptr[rsp + 0x50]);
+			push(r10);
+			push(r11);
+			lea(rsp, ptr[rsp - 0x128]);
+			movaps(ptr[rsp + 0x80], xmm1);
+			movaps(ptr[rsp + 0x90], xmm2);
+			movaps(ptr[rsp + 0x100], xmm3);
+			movaps(ptr[rsp + 0x110], xmm5);
+			movss(ptr[rsp + 0x70], xmm7);
+			movss(ptr[rsp + 0x74], xmm8);
+			movss(ptr[rsp + 0x78], xmm6);
+			lea(r8, ptr[rsp + 0x70]);
 			mov(rdx, rsi);
 			mov(rax, getAccelMul);
 			call(rax);
-			movaps(xmm1, ptr[rsp + 0x60]);
-			movaps(xmm3, ptr[rsp + 0x70]);
-			lea(rsp, ptr[rsp + 0x78]);
+			movaps(xmm1, ptr[rsp + 0x80]);
+			movaps(xmm2, ptr[rsp + 0x90]);
+			movaps(xmm3, ptr[rsp + 0x100]);
+			movaps(xmm5, ptr[rsp + 0x110]);
+			lea(rsp, ptr[rsp + 0x128]);
+			mulss(xmm7, dword[rax]);
+			mulss(xmm8, dword[rax + 0x4]);
+			mulss(xmm6, dword[rax + 0x8]);
+			pop(r11);
+			pop(r10);
 			pop(r9);
 			pop(r8);
 			pop(rdx);
 			pop(rcx);
-			mulss(xmm7, dword[rax]);
-			mulss(xmm8, dword[rax + 0x4]);
-			mulss(xmm6, dword[rax + 0x8]);
 			pop(rax);
 
-			L(retn);
 			movss(ptr[rsi + 0xB0], xmm7);
 			movss(ptr[rsi + 0xB4], xmm8);
 			movss(ptr[rsi + 0xB8], xmm6);
@@ -162,7 +170,6 @@ bool PhysicsManager::Simulate(Actor* a) {
 		hkVector4 vel;
 		GetVelocity(controller, vel);
 
-		float dt_t = dt / 16666.6667f;
 		float len = vel.Length();
 		hkVector4 friction = vel * -1.0f * (float)onGround * pd->friction;
 		friction.z = 0.0f;
@@ -172,7 +179,7 @@ bool PhysicsManager::Simulate(Actor* a) {
 
 		vel += pd->velocity;
 		pd->velocity = hkVector4();
-		pd->currentVelocity = vel + (friction + drag) * dt_t;
+		pd->currentVelocity = vel + friction + drag;
 		SetVelocity(controller, pd->currentVelocity);
 
 		pd->lastRun = std::chrono::system_clock::now();
