@@ -18,6 +18,7 @@ extern uintptr_t ptr_ShakeCameraNative;
 extern uintptr_t ptr_ApplyImageSpaceModifier;
 extern uintptr_t ptr_VelocityInjectionPoint;
 extern uintptr_t ptr_FrictionOverridePoint;
+extern uintptr_t ptr_OnGroundVelocityOverridePoint;
 
 typedef void (*_SendNotification)(const char* str);
 extern _SendNotification SendNotification_Fn;

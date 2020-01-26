@@ -14,6 +14,7 @@ uintptr_t ptr_ShakeCameraNative;
 uintptr_t ptr_ApplyImageSpaceModifier;
 uintptr_t ptr_VelocityInjectionPoint;
 uintptr_t ptr_FrictionOverridePoint;
+uintptr_t ptr_OnGroundVelocityOverridePoint;
 
 _SendNotification SendNotification_Fn;
 _Play_Native Play_Native;
@@ -81,6 +82,9 @@ void AddressManager::FindAddresses() {
 	uintptr_t calculateFrictionOffset = ptr_VelocityInjectionPoint + 0x116;
 	ptr_FrictionOverridePoint = (calculateFrictionOffset + *(UInt32*)(calculateFrictionOffset + 0x1) + 0x232);
 	_MESSAGE("Friction Override Point %llx", ptr_FrictionOverridePoint);
+
+	ptr_OnGroundVelocityOverridePoint = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0x0F, 0x28, 0x33, 0x0F, 0x28, 0xEE}) - 0x54;
+	_MESSAGE("On Ground Velocity Override Point %llx", ptr_OnGroundVelocityOverridePoint);
 
 	delete(mr);
 }
