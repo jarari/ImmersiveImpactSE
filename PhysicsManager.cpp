@@ -12,7 +12,7 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 	Actor* a = (Actor*)(**(UInt64 **)((UInt64)cCon + 0x10) - 0xD0);
 	if (datamap.count((UInt64)a)) {
 		PhysData* pd = GetData(a);
-		hkVector4 currLocal = Utils::WorldToLocal(pd->currentVelocity, NiPoint3(), Utils::GetRotationMatrix33(-a->rot.x, -a->rot.z, 0));
+		hkVector4 currLocal = Utils::WorldToLocal(pd->currentVelocity, NiPoint3(), Utils::GetRotationMatrix33(0, -a->rot.z, 0));
 		hkVector4 mult = hkVector4(1, 1, 1);
 		if (limit.x != 0) {
 			if (currLocal.x * limit.x >= 0) { //same sign
