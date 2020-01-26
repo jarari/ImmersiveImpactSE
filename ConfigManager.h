@@ -75,6 +75,7 @@ enum iConfigType {
 	Knockback_Dagger,
 	Knockback_1H,
 	Knockback_2H,
+	Knockback_LastMultiplier,
 	EnableDash,
 	Dash_Fist,
 	Dash_Dagger,

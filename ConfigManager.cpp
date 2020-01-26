@@ -73,6 +73,7 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("Knockback_Dagger", 200.0f));
 	configs.push_back(Config("Knockback_1H", 30.0f));
 	configs.push_back(Config("Knockback_2H", 50.0f));
+	configs.push_back(Config("Knockback_LastMultiplier", 5.0f));
 	configs.push_back(Config("EnableDash", 0));
 	configs.push_back(Config("Dash_Fist", 20.0f));
 	configs.push_back(Config("Dash_Dagger", 15.0f));

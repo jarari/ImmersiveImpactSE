@@ -63,10 +63,9 @@ void HitEventTask::Run() {
 
 			if (ConfigManager::GetConfig()[iConfigType::EnableKnockback].value) {
 				hkVector4 vel = hkVector4(target->pos - attacker->pos);
-				vel.z = 0;
 				vel.Normalize();
 				if (ae->magnitude + 1 == ConfigManager::GetConfig()[iConfigType::StaggerLimit].value) {
-					PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / 20.0f);
+					PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / (2.0f * ConfigManager::GetConfig()[iConfigType::Knockback_LastMultiplier].value));
 				}
 				else {
 					PhysicsManager::SetFriction(target, PhysicsManager::defaultFriction / 2.0f);
