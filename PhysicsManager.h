@@ -1,4 +1,5 @@
 #pragma once
+#include <common\ICriticalSection.h>
 #include <skse64\GameReferences.h>
 #include <skse64\NiTypes.h>
 #include <chrono>
@@ -134,6 +135,7 @@ struct PhysData {
 namespace PhysicsManager {
 	extern float defaultFriction;
 	extern float defaultDrag;
+	static ICriticalSection data_Lock;
 	static unordered_map<UInt64, PhysData> datamap;
 	hkVector4 GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit);
 	void HookOnGroundVelocity();

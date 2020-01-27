@@ -40,8 +40,7 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 				mult.z = 1.0f;
 			}
 		}
-		float falltime = *(float*)((UInt64)cCon + 0x244);
-		return mult / (falltime + 1.0f);
+		return mult;
 	}
 	return hkVector4(1, 1, 1);
 }
@@ -68,26 +67,30 @@ void PhysicsManager::HookOnGroundVelocity() {
 			push(r9);
 			push(r10);
 			push(r11);
-			lea(rsp, ptr[rsp - 0x128]);
-			movaps(ptr[rsp + 0x80], xmm1);
-			movaps(ptr[rsp + 0x90], xmm2);
-			movaps(ptr[rsp + 0x100], xmm3);
-			movaps(ptr[rsp + 0x110], xmm5);
-			movss(ptr[rsp + 0x70], xmm7);
-			movss(ptr[rsp + 0x74], xmm8);
-			movss(ptr[rsp + 0x78], xmm6);
-			lea(r8, ptr[rsp + 0x70]);
+			lahf();
+			lea(rsp, ptr[rsp - 0x208]);
+			mov(ptr[rsp + 0x150], ah);
+			movaps(ptr[rsp + 0x160], xmm1);
+			movaps(ptr[rsp + 0x170], xmm2);
+			movaps(ptr[rsp + 0x180], xmm3);
+			movaps(ptr[rsp + 0x190], xmm5);
+			movss(ptr[rsp + 0x140], xmm7);
+			movss(ptr[rsp + 0x144], xmm8);
+			movss(ptr[rsp + 0x148], xmm6);
+			lea(r8, ptr[rsp + 0x140]);
 			mov(rdx, rsi);
 			mov(rax, getAccelMul);
 			call(rax);
-			movaps(xmm1, ptr[rsp + 0x80]);
-			movaps(xmm2, ptr[rsp + 0x90]);
-			movaps(xmm3, ptr[rsp + 0x100]);
-			movaps(xmm5, ptr[rsp + 0x110]);
-			lea(rsp, ptr[rsp + 0x128]);
 			mulss(xmm7, dword[rax]);
 			mulss(xmm8, dword[rax + 0x4]);
 			mulss(xmm6, dword[rax + 0x8]);
+			movaps(xmm1, ptr[rsp + 0x160]);
+			movaps(xmm2, ptr[rsp + 0x170]);
+			movaps(xmm3, ptr[rsp + 0x180]);
+			movaps(xmm5, ptr[rsp + 0x190]);
+			mov(ah, ptr[rsp + 0x150]);
+			lea(rsp, ptr[rsp + 0x208]);
+			sahf();
 			pop(r11);
 			pop(r10);
 			pop(r9);
@@ -188,11 +191,15 @@ bool PhysicsManager::Simulate(Actor* a) {
 }
 
 void PhysicsManager::InitializeData(Actor* a) {
+	data_Lock.Enter();
 	datamap.insert(std::make_pair((UInt64)a, PhysData(PhysicsManager::defaultFriction, PhysicsManager::defaultDrag)));
+	data_Lock.Leave();
 }
 
 void PhysicsManager::ResetPhysics() {
+	data_Lock.Enter();
 	datamap.clear();
+	data_Lock.Leave();
 }
 
 void PhysicsManager::ResetTimer() {
