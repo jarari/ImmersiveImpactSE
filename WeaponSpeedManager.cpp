@@ -89,7 +89,7 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn, bool delayed) {
 				viewRestrained = true;
 			}
 		}
-		else if (evn == iSwingState::Hit) {
+		else if (evn == iSwingState::Swing) {
 			if (ConfigManager::GetConfig()[iConfigType::EnableDash].value && weptype_r != iWepType::None && !ActorManager::IsInKillmove(a)) {
 				NiPoint3 fwd;
 				Utils::GetRefForward(-a->rot.x, -a->rot.z, 0, &fwd);
