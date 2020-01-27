@@ -173,7 +173,6 @@ bool PhysicsManager::Simulate(Actor* a) {
 		GetVelocity(controller, vel);
 
 		float dt_t = *(float*)ptr_EngineTick * 1000000.0f / tick;
-		_MESSAGE("tick %f pmtick %i dt_t %f", *(float*)ptr_EngineTick, tick,  dt_t);
 		float len = vel.Length();
 		hkVector4 friction = vel * -1.0f * (float)onGround * pd->friction;
 		friction.z = 0.0f;
