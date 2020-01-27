@@ -19,12 +19,13 @@ void HitStopThreadFunc(int duration, int sync) {
 	PlayerCameraEx* pCam = (PlayerCameraEx*)PlayerCamera::GetSingleton();
 	(*(UInt32*)(ptr_UnknownDataHolder + 0x160))++;
 	//CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleHitStopHelper"), UIMessage::kMessage_Open, nullptr);
+	int dur = max(duration, 15);
 	int slept = 0;
-	int sleepPerCall = duration / 15;
+	int sleepPerCall = dur / 15;
 	float fovStep = ConfigManager::GetConfig()[iConfigType::HitStop_FovStep].value;
 	float fovDiff = 0;
-	while (slept < duration) {
-		if (slept < duration / 2) {
+	while (slept < dur) {
+		if (slept < dur / 2) {
 			pCam->worldFOV -= fovStep;
 			pCam->firstPersonFOV -= fovStep;
 			fovDiff -= fovStep;
