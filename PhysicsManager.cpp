@@ -5,6 +5,7 @@
 #include <skse64_common\SafeWrite.h>
 #include <xbyak\xbyak.h>
 
+int PhysicsManager::tick = 16667;
 float PhysicsManager::defaultFriction = 0.75f;
 float PhysicsManager::defaultDrag = 1.0f;
 
@@ -114,8 +115,6 @@ void PhysicsManager::HookOnGroundVelocity() {
 		return;
 }
 
-int PhysData::tick = 30;
-
 PhysData* PhysicsManager::GetData(Actor* a) {
 	if (!datamap.count((UInt64)a))
 		return NULL;
@@ -152,7 +151,7 @@ bool PhysicsManager::Simulate(Actor* a) {
 	PhysData* pd = GetData(a);
 	if (!pd) return false;
 	float dt = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - pd->lastRun).count();
-	if (dt >= pd->tick) {
+	if (dt >= tick) {
 		bhkCharacterController* controller = *(bhkCharacterController * *)((UInt64)a->processManager->middleProcess + 0x250);
 		if (!controller) {
 			datamap.erase((UInt64)a);
@@ -173,6 +172,8 @@ bool PhysicsManager::Simulate(Actor* a) {
 		hkVector4 vel;
 		GetVelocity(controller, vel);
 
+		float dt_t = *(float*)ptr_EngineTick * 1000000.0f / tick;
+		_MESSAGE("tick %f pmtick %i dt_t %f", *(float*)ptr_EngineTick, tick,  dt_t);
 		float len = vel.Length();
 		hkVector4 friction = vel * -1.0f * (float)onGround * pd->friction;
 		friction.z = 0.0f;
@@ -182,7 +183,7 @@ bool PhysicsManager::Simulate(Actor* a) {
 
 		vel += pd->velocity;
 		pd->velocity = hkVector4();
-		pd->currentVelocity = vel + friction + drag;
+		pd->currentVelocity = vel + (friction + drag) * dt_t;
 		SetVelocity(controller, pd->currentVelocity);
 
 		pd->lastRun = std::chrono::system_clock::now();

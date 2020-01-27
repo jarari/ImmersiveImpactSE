@@ -170,7 +170,7 @@ void ConfigManager::LoadConfigs() {
 		sprintf_s(f2c, "%f", physconfigs[i].value);
 		physconfigs[i].value = std::stof(ini.GetValue("Phys", physconfigs[i].name, f2c, NULL));
 	}
-	PhysData::tick = physconfigs[0].value;
+	PhysicsManager::tick = physconfigs[0].value * 1000000;
 	PhysicsManager::defaultFriction = physconfigs[1].value;
 	PhysicsManager::defaultDrag = physconfigs[2].value;
 }

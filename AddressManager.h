@@ -19,6 +19,7 @@ extern uintptr_t ptr_VelocityInjectionPoint;
 extern uintptr_t ptr_FrictionOverridePoint;
 extern uintptr_t ptr_OnGroundVelocityOverridePoint;
 extern uintptr_t ptr_AccelerationOverridePoint;
+extern uintptr_t ptr_EngineTick;
 
 typedef void (*_SendNotification)(const char* str);
 extern _SendNotification SendNotification_Fn;

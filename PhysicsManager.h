@@ -116,7 +116,6 @@ public:
 
 class bhkCharacterController;
 struct PhysData {
-	static int tick;
 	float friction;
 	float airdrag;
 	std::chrono::system_clock::time_point lastRun;
@@ -133,6 +132,7 @@ struct PhysData {
 };
 
 namespace PhysicsManager {
+	extern int tick;
 	extern float defaultFriction;
 	extern float defaultDrag;
 	static ICriticalSection data_Lock;

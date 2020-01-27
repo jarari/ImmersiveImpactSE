@@ -15,6 +15,7 @@ uintptr_t ptr_VelocityInjectionPoint;
 uintptr_t ptr_FrictionOverridePoint;
 uintptr_t ptr_OnGroundVelocityOverridePoint;
 uintptr_t ptr_AccelerationOverridePoint;
+uintptr_t ptr_EngineTick;
 
 _SendNotification SendNotification_Fn;
 _Play_Native Play_Native;
@@ -83,6 +84,10 @@ void AddressManager::FindAddresses() {
 
 	ptr_AccelerationOverridePoint = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0xF3, 0x0F, 0x59, 0xF8, 0xF3, 0x0F, 0x11, 0xBE});
 	_MESSAGE("Acceleration Override Point %llx", ptr_AccelerationOverridePoint);
+
+	uintptr_t engineTickOffset = ptr_AccelerationOverridePoint - 0x78;
+	ptr_EngineTick = (engineTickOffset + *(UInt32*)(engineTickOffset + 0x4)) + 0x8;
+	_MESSAGE("Engine Tick %llx", ptr_EngineTick);
 
 	delete(mr);
 }
