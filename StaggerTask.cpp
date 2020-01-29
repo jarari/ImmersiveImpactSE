@@ -25,7 +25,7 @@ void StaggerTask::Run() {
 	if (counter <= 2)
 		return;
 	bool isStaggering = false;
-	bool dontMove = false;//*(UInt32*)((UInt32)target->processManager + 0x5C) & 0x4 == 0x4;
+	bool dontMove = (target->actorState.flags04 & 0x1200000) == 0x1200000;
 	bool isBleedingOut = false;
 	((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->GetAnimationVariableBool("IsStaggering", isStaggering);
 	((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->GetAnimationVariableBool("IsBleedingOut", isBleedingOut);
