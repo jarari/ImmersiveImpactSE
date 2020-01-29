@@ -162,22 +162,17 @@ bool PhysicsManager::Simulate(Actor* a) {
 		typedef bool (*_SetVelocity)(bhkCharacterController * con, const hkVector4 & vel);
 		_SetVelocity SetVelocity = *(_SetVelocity*)(*(UInt64*)controller + 0x38);
 
-		void* groundEntity = *(void**)((UInt64)controller + 0x2B0);
-		hkVector4* groundNormal = (hkVector4*)((UInt64)controller + 0x1B0);
-		float falltime = *(float*)((UInt64)controller + 0x244);
-		UInt32 state = *(UInt32*)((UInt64)controller + 0x200);
+		UInt32 flag = *(UInt32*)((UInt64)controller + 0x218);
 
-		bool onGround = falltime == 0 && state == 0 && groundEntity;
-		bool inWater = onGround && !groundEntity;
+		bool onGround = (flag & 0x100) == 0x100;
+		bool inWater = (flag & 0xA00000) == 0xA00000;
 
 		hkVector4 vel;
 		GetVelocity(controller, vel);
 
 		float dt_t = *(float*)ptr_EngineTick * 1000000.0f / tick;
 		float len = vel.Length();
-		hkVector4 friction = vel * -1.0f * (float)onGround * pd->friction;
-		if (!inWater)
-			friction.z = 0;
+		hkVector4 friction = vel * -1.0f * (onGround || inWater ? 1.0f : 0.0f) * pd->friction;
 		hkVector4 drag = vel;
 		drag.Normalize();
 		drag *= hkVector4(1.0f, 1.0f, 0.1f) * -0.5f * len * len * ((float)inWater + 1.0f) * pd->airdrag * dt / 60000000.0f;
