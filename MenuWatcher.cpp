@@ -113,12 +113,6 @@ EventResult MenuWatcher::ReceiveEvent(MenuOpenCloseEvent* evn, EventDispatcher<M
 			WeaponSpeedManager::ResetRestraintChecker();
 		}
 	}
-	else if (!evn->opening) {
-		IMenu* menu = mm->GetMenu(&evn->menuName);
-		if (menu && (menu->flags & 0x1) == 0x1) {
-			PhysicsManager::ResetTimer();
-		}
-	}
 	
 	return kEvent_Continue;
 }
