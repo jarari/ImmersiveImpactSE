@@ -41,9 +41,8 @@ extern "C" {
 
 			return false;
 		}
-		else if (skse->runtimeVersion != RUNTIME_VERSION_1_5_80) {
-			_MESSAGE("You're running this mod on runtime version %08X. This mod is designed for 1.5.80 so it may not work perfectly.", skse->runtimeVersion);
-
+		else if (skse->runtimeVersion != RUNTIME_VERSION_1_5_97) {
+			_MESSAGE("You're running this mod on runtime version %08X. This mod is designed for 1.5.97 so it may not work perfectly.", skse->runtimeVersion);
 		}
 		if (!g_branchTrampoline.Create(1024 * 64)) {
 			_ERROR("couldn't create branch trampoline. this is fatal. skipping remainder of init process.");
@@ -74,7 +73,8 @@ extern "C" {
 				MenuWatcher::InitWatcher();
 				HitEventWatcher::InitWatcher();
 				ObjectLoadWatcher::InitWatcher();
-				PhysicsManager::HookOnGroundVelocity();
+				if(ConfigManager::GetConfig()[iConfigType::EnableDash].value || ConfigManager::GetConfig()[iConfigType::EnableKnockback].value)
+					PhysicsManager::HookSkyrimPhys();
 				_MESSAGE("Player : %llx", *g_thePlayer);
 			}
 		});
