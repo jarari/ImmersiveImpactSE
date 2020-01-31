@@ -46,6 +46,9 @@ public:
 	hkVector4 operator-(const hkVector4& v) {
 		return hkVector4(x - v.x, y - v.y, z - v.z);
 	}
+	hkVector4 operator-() {
+		return hkVector4(x * -1.0f, y * -1.0f, z * -1.0f);
+	}
 	hkVector4& operator-=(const hkVector4& v) {
 		this->x -= v.x;
 		this->y -= v.y;
@@ -124,6 +127,7 @@ struct PhysData {
 	PhysData() {
 		lastRun = std::chrono::system_clock::now();
 		velocity = hkVector4();
+		currentVelocity = hkVector4();
 	}
 	PhysData(float f, float d) : PhysData() {
 		friction = f;

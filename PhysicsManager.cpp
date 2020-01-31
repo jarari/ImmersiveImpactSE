@@ -8,14 +8,19 @@
 int PhysicsManager::tick = 16667;
 float PhysicsManager::defaultFriction = 0.75f;
 float PhysicsManager::defaultDrag = 1.0f;
+typedef bool (*_GetVelocity)(bhkCharacterController* con, const hkVector4& vel);
+typedef bool (*_SetVelocity)(bhkCharacterController* con, const hkVector4& vel);
 
 hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit) {
 	Actor* a = (Actor*)(**(UInt64 **)((UInt64)cCon + 0x10) - 0xD0);
+	_GetVelocity GetVelocity = *(_GetVelocity*)(*(UInt64*)cCon + 0x30);
 	if (datamap.count((UInt64)a)) {
 		PhysData* pd = GetData(a);
 		if (!pd)
 			return hkVector4(1, 1, 1);
-		hkVector4 currLocal = Utils::WorldToLocal(pd->currentVelocity, NiPoint3(), Utils::GetRotationMatrix33(0, -a->rot.z, 0));
+		hkVector4 curr;
+		GetVelocity(cCon, curr);
+		hkVector4 currLocal = Utils::WorldToLocal(curr, NiPoint3(), Utils::GetRotationMatrix33(0, -a->rot.z, 0));
 		hkVector4 mult = hkVector4(1, 1, 1);
 		if (limit.x != 0) {
 			if (currLocal.x * limit.x >= 0) { //same sign
@@ -25,6 +30,9 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 				mult.x = 1.0f;
 			}
 		}
+		else {
+			mult.x = 0;
+		}
 		if (limit.y != 0) {
 			if (currLocal.y * limit.y >= 0) {
 				mult.y = max(abs(limit.y) - abs(currLocal.y), 0) / abs(limit.y);
@@ -32,6 +40,9 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 			else {
 				mult.y = 1.0f;
 			}
+		}
+		else {
+			mult.y = 0;
 		}
 		if (limit.z != 0) {
 			if (currLocal.z * limit.z >= 0) {
@@ -41,6 +52,10 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 				mult.z = 1.0f;
 			}
 		}
+		else {
+			mult.z = 0;
+		}
+		//_MESSAGE("currlocal\t\t%f %f %f\nlimit\t\t\t%f %f %f\nmult\t\t\t%f %f %f", currLocal.x, currLocal.y, currLocal.z, limit.x, limit.y, limit.z, mult.x, mult.y, mult.z);
 		return mult;
 	}
 	return hkVector4(1, 1, 1);
@@ -157,9 +172,7 @@ bool PhysicsManager::Simulate(Actor* a) {
 			datamap.erase((UInt64)a);
 			return false;
 		}
-		typedef bool (*_GetVelocity)(bhkCharacterController * con, const hkVector4 & vel);
 		_GetVelocity GetVelocity = *(_GetVelocity*)(*(UInt64*)controller + 0x30);
-		typedef bool (*_SetVelocity)(bhkCharacterController * con, const hkVector4 & vel);
 		_SetVelocity SetVelocity = *(_SetVelocity*)(*(UInt64*)controller + 0x38);
 
 		UInt32 flag = *(UInt32*)((UInt64)controller + 0x218);
@@ -170,16 +183,24 @@ bool PhysicsManager::Simulate(Actor* a) {
 		hkVector4 vel;
 		GetVelocity(controller, vel);
 
-		float dt_t = *(float*)ptr_EngineTick * 1000000.0f / tick;
-		float len = vel.Length();
-		hkVector4 friction = vel * -1.0f * (onGround || inWater ? 1.0f : 0.0f) * pd->friction;
-		hkVector4 drag = vel;
-		drag.Normalize();
-		drag *= hkVector4(1.0f, 1.0f, 0.1f) * -0.5f * len * len * ((float)inWater + 1.0f) * pd->airdrag * dt / 60000000.0f;
-
+		float dt_t = *(float*)ptr_EngineTick * 1000000.0f / 16666.6667f;
 		vel += pd->velocity;
 		pd->velocity = hkVector4();
-		pd->currentVelocity = vel + (friction + drag) * dt_t;
+		float len = vel.Length();
+		hkVector4 friction = -pd->currentVelocity * onGround * pd->friction * dt_t;
+		hkVector4 drag = -pd->currentVelocity;
+		drag.Normalize();
+		float density = inWater ? 997.0f : 1.225f;
+		float c = 0.005f * *(float*)ptr_EngineTick * density * len * len * pd->airdrag;
+		drag *= c;
+		if(abs(drag.x) > abs(pd->currentVelocity.x))
+			drag.x = -pd->currentVelocity.x;
+		if (abs(drag.y) > abs(pd->currentVelocity.y))
+			drag.y = -pd->currentVelocity.y;
+		if (abs(drag.z) > abs(pd->currentVelocity.z))
+			drag.z = -pd->currentVelocity.z;
+
+		pd->currentVelocity = vel + friction + drag;
 		SetVelocity(controller, pd->currentVelocity);
 
 		pd->lastRun = std::chrono::system_clock::now();
