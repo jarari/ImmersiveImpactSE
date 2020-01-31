@@ -45,14 +45,9 @@ EventResult ObjectLoadWatcher::ReceiveEvent(TESObjectLoadedEvent* evn, EventDisp
 			HookWatchers((Actor*)form);
 			PlayerCharacterHooked = true;
 		}
-		/*else if (_a && !_c && !ActorHooked) {
-			TESFullName* pname = DYNAMIC_CAST(((Actor*)form)->baseForm, TESForm, TESFullName);
-			const char* name;
-			if (pname)
-				name = pname->name.data;
-			_MESSAGE("Actor Ptr : %llx, Name : %s", form, name);
-			AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&((Actor*)form)->animGraphEventSink);
-			ae->HookSink();
+		/*else if (_a && !_c && !_p && !ActorHooked) {
+			_MESSAGE("Actor Ptr : %llx, Name : %s", form, Utils::GetName(((Actor*)form)->baseForm));
+			HookWatchers((Actor*)form);
 			ActorHooked = true;
 		}*/
 		if (CharacterHooked && PlayerCharacterHooked)
