@@ -95,8 +95,7 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn, bool delayed) {
 				Utils::GetRefForward(-a->rot.x, -a->rot.z, 0, &fwd);
 				fwd *= ConfigManager::GetConfig()[iConfigType::Dash_Fist + weptype_r].value;
 				PhysicsManager::AddVelocity((Character*)a, hkVector4(fwd));
-				PhysicsManager::SetFriction((Character*)a, 0.75f);
-				PhysicsManager::SetDrag((Character*)a, 0.0f);
+				PhysicsManager::SetFriction((Character*)a, PhysicsManager::defaultFriction / 2.0f);
 			}
 		}
 		else if (evn == iSwingState::End) {
