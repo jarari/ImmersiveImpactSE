@@ -2,6 +2,7 @@
 #include "AddressManager.h"
 #include "CharacterMoveEventWatcher.h"
 #include "ObjectLoadWatcher.h"
+#include "PhysicsManager.h"
 #include "Utils.h"
 #include <skse64\GameReferences.h>
 #include <skse64\GameRTTI.h>
@@ -16,6 +17,15 @@ void ObjectLoadWatcher::InitWatcher() {
 	_MESSAGE((className + std::string(" initialized.")).c_str());
 }
 
+void HookWatchers(Actor* a) {
+	AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&a->animGraphEventSink);
+	ae->HookSink();
+	if (PhysicsManager::physHooked) {
+		CharacterMoveEventWatcher* cme = (CharacterMoveEventWatcher*)(&a->characterMoveFinishEvent);
+		cme->HookSink();
+	}
+}
+
 bool ActorHooked = false;
 bool CharacterHooked = false;
 bool PlayerCharacterHooked = false;
@@ -27,18 +37,12 @@ EventResult ObjectLoadWatcher::ReceiveEvent(TESObjectLoadedEvent* evn, EventDisp
 		PlayerCharacter* _p = dynamic_cast<PlayerCharacter*>(form);
 		if (_c && !_p && !CharacterHooked) {
 			_MESSAGE("Character Ptr : %llx, Name : %s", form, Utils::GetName(((Actor*)form)->baseForm));
-			AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&((Actor*)form)->animGraphEventSink);
-			ae->HookSink();
-			CharacterMoveEventWatcher* cme = (CharacterMoveEventWatcher*)(&((Actor*)form)->characterMoveFinishEvent);
-			cme->HookSink();
+			HookWatchers((Actor*)form);
 			CharacterHooked = true;
 		}
 		else if (_p && !PlayerCharacterHooked) {
 			_MESSAGE("PlayerCharacter Ptr : %llx, Name : %s", form, Utils::GetName(((Actor*)form)->baseForm));
-			AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&((Actor*)form)->animGraphEventSink);
-			ae->HookSink();
-			CharacterMoveEventWatcher* cme = (CharacterMoveEventWatcher*)(&((Actor*)form)->characterMoveFinishEvent);
-			cme->HookSink();
+			HookWatchers((Actor*)form);
 			PlayerCharacterHooked = true;
 		}
 		/*else if (_a && !_c && !ActorHooked) {

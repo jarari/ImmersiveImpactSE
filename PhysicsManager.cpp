@@ -61,16 +61,8 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 	return hkVector4(1, 1, 1);
 }
 
-void PhysicsManager::HookOnGroundVelocity() {
-	SafeWrite8(ptr_FrictionOverridePoint, 0x90);
-	SafeWrite8(ptr_FrictionOverridePoint + 1, 0x90);
-	SafeWrite8(ptr_FrictionOverridePoint + 2, 0x90);
-
-	SafeWrite8(ptr_OnGroundVelocityOverridePoint, 0x90);
-	SafeWrite8(ptr_OnGroundVelocityOverridePoint + 1, 0xE9);
-
-
-	struct InstallHookAcceleration_Code : Xbyak::CodeGenerator {
+void PhysicsManager::HookSkyrimPhys() {
+	_MESSAGE("Dash or knockback enabled. Replacing Skyrim physics."); struct InstallHookAcceleration_Code : Xbyak::CodeGenerator {
 		InstallHookAcceleration_Code(void* buf, uintptr_t getAccelMul) : Xbyak::CodeGenerator(4096, buf) {
 			mulss(xmm7, xmm0);	//x
 			mulss(xmm8, xmm0);	//y
@@ -128,6 +120,15 @@ void PhysicsManager::HookOnGroundVelocity() {
 
 	if (!g_branchTrampoline.Write5Branch(ptr_AccelerationOverridePoint, uintptr_t(code.getCode())))
 		return;
+
+	SafeWrite8(ptr_FrictionOverridePoint, 0x90);
+	SafeWrite8(ptr_FrictionOverridePoint + 1, 0x90);
+	SafeWrite8(ptr_FrictionOverridePoint + 2, 0x90);
+
+	SafeWrite8(ptr_OnGroundVelocityOverridePoint, 0x90);
+	SafeWrite8(ptr_OnGroundVelocityOverridePoint + 1, 0xE9);
+
+	physHooked = true;
 }
 
 PhysData* PhysicsManager::GetData(Actor* a) {
