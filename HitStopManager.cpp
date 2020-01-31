@@ -10,6 +10,12 @@
 #include <skse64\PapyrusVM.h>
 #include <thread>
 using std::thread;
+TESImageSpaceModifier* HitStopManager::blurModifier;
+ICriticalSection HitStopThreadManager::threadQueue_Lock;
+ICriticalSection HitStopThreadManager::gamePause_Lock;
+bool HitStopThreadManager::running;
+queue<thread*> HitStopThreadManager::threadQueue;
+thread* HitStopThreadManager::lastThread;
 
 void HitStopThreadFunc(int duration, int sync) {
 	HitStopThreadManager::gamePause_Lock.Enter();

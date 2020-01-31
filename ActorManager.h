@@ -8,7 +8,7 @@ class TESSound;
 class Actor;
 
 namespace ActorManager {
-	static TESSound* deflectSound;
+	extern TESSound* deflectSound;
 	void FindDeflectSound();
 	void deflectAttack(Actor* actor, ActiveEffect* ae, bool isArrow = false, bool playSound = true, float volume = 1.0f);
 	bool IsInKillmove(Actor* a);

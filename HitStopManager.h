@@ -9,17 +9,17 @@ using std::queue;
 struct TESHitEvent;
 class TESImageSpaceModifier;
 namespace HitStopManager {
-	static TESImageSpaceModifier* blurModifier;
+	extern TESImageSpaceModifier* blurModifier;
 	void FindBlurEffect();
 	void UnleashCameraShakeLimit();
 	void EvaluateEvent(TESHitEvent* evn);
 }
 
 namespace HitStopThreadManager {
-	static ICriticalSection threadQueue_Lock;
-	static ICriticalSection gamePause_Lock;
-	static bool running;
-	static queue<thread*> threadQueue;
-	static thread* lastThread;
+	extern ICriticalSection threadQueue_Lock;
+	extern ICriticalSection gamePause_Lock;
+	extern bool running;
+	extern queue<thread*> threadQueue;
+	extern thread* lastThread;
 	void RequestLaunch();
 }

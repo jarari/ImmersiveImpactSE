@@ -7,6 +7,8 @@
 #include <skse64\GameReferences.h>
 #include <skse64\PapyrusVM.h>
 
+TESSound* ActorManager::deflectSound;
+
 bool isRidingHorse(Actor* a) {
 	return (a->actorState.flags04 & (3 << 14));
 }
