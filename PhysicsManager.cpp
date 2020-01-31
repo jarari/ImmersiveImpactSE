@@ -5,9 +5,12 @@
 #include <skse64_common\SafeWrite.h>
 #include <xbyak\xbyak.h>
 
-int PhysicsManager::tick = 16667;
-float PhysicsManager::defaultFriction = 0.75f;
-float PhysicsManager::defaultDrag = 1.0f;
+int PhysicsManager::tick = 16666;
+float PhysicsManager::defaultFriction = 1.0f;
+float PhysicsManager::defaultDrag = 1.0f; 
+bool PhysicsManager::physHooked = false;
+ICriticalSection PhysicsManager::data_Lock;
+unordered_map<UInt64, PhysData> PhysicsManager::datamap;
 typedef bool (*_GetVelocity)(bhkCharacterController* con, const hkVector4& vel);
 typedef bool (*_SetVelocity)(bhkCharacterController* con, const hkVector4& vel);
 
@@ -17,11 +20,11 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 	if (datamap.count((UInt64)a)) {
 		PhysData* pd = GetData(a);
 		if (!pd)
-			return hkVector4(1, 1, 1);
-		hkVector4 curr;
+			return hkVector4(1.0f, 1.0f, 1.0f);
+		hkVector4 curr = hkVector4(0, 0, 0);
 		GetVelocity(cCon, curr);
 		hkVector4 currLocal = Utils::WorldToLocal(curr, NiPoint3(), Utils::GetRotationMatrix33(0, -a->rot.z, 0));
-		hkVector4 mult = hkVector4(1, 1, 1);
+		hkVector4 mult = hkVector4(1.0f, 1.0f, 1.0f);
 		if (limit.x != 0) {
 			if (currLocal.x * limit.x >= 0) { //same sign
 				mult.x = max(abs(limit.x) - abs(currLocal.x), 0) / abs(limit.x);
@@ -58,7 +61,7 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 		//_MESSAGE("currlocal\t\t%f %f %f\nlimit\t\t\t%f %f %f\nmult\t\t\t%f %f %f", currLocal.x, currLocal.y, currLocal.z, limit.x, limit.y, limit.z, mult.x, mult.y, mult.z);
 		return mult;
 	}
-	return hkVector4(1, 1, 1);
+	return hkVector4(1.0f, 1.0f, 1.0f);
 }
 
 void PhysicsManager::HookSkyrimPhys() {
@@ -188,7 +191,6 @@ bool PhysicsManager::Simulate(Actor* a) {
 		vel += pd->velocity;
 		pd->velocity = hkVector4();
 		float len = vel.Length();
-		hkVector4 friction = -pd->currentVelocity * onGround * pd->friction * dt_t;
 		hkVector4 drag = -pd->currentVelocity;
 		drag.Normalize();
 		float density = inWater ? 997.0f : 1.225f;
@@ -200,6 +202,10 @@ bool PhysicsManager::Simulate(Actor* a) {
 			drag.y = -pd->currentVelocity.y;
 		if (abs(drag.z) > abs(pd->currentVelocity.z))
 			drag.z = -pd->currentVelocity.z;
+		hkVector4 groundNormal = *(hkVector4*)((UInt64)controller + 0x1B0);
+		hkVector4 friction = -(vel + drag) * onGround * pd->friction * dt_t;
+		hkVector4 frictionNormal = friction.GetNormalized();
+		friction = (1.0f - frictionNormal.Dot(groundNormal)) * frictionNormal * friction.Length();
 
 		pd->currentVelocity = vel + friction + drag;
 		SetVelocity(controller, pd->currentVelocity);
@@ -225,4 +231,8 @@ void PhysicsManager::ResetTimer() {
 	for (unordered_map<UInt64, PhysData>::iterator it = datamap.begin(); it != datamap.end(); it++) {
 		it->second.lastRun = std::chrono::system_clock::now();
 	}
+}
+
+hkVector4 operator*(float a, hkVector4& v) {
+	return v * a;
 }

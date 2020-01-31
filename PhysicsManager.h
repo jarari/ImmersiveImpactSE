@@ -6,7 +6,7 @@
 #include <unordered_map>
 using std::unordered_map;
 
-typedef float  hkReal;
+typedef float hkReal;
 class hkVector4 {
 public:
 	hkVector4() { x = 0; y = 0; z = 0; w = 0; };
@@ -112,10 +112,20 @@ public:
 		this->z /= l;
 		return *this;
 	}
+	hkVector4& GetNormalized() {
+		hkVector4 norm = *this;
+		norm.Normalize();
+		return norm;
+	}
+	float Dot(const hkVector4& v) {
+		return this->x * v.x + this->y * v.y + this->z * v.z;
+	}
 	operator NiPoint3() {
 		return NiPoint3(x, y, z);
 	}
 };
+
+hkVector4 operator*(float a, hkVector4& v);
 
 class bhkCharacterController;
 struct PhysData {
@@ -139,9 +149,9 @@ namespace PhysicsManager {
 	extern int tick;
 	extern float defaultFriction;
 	extern float defaultDrag;
-	static bool physHooked;
-	static ICriticalSection data_Lock;
-	static unordered_map<UInt64, PhysData> datamap;
+	extern bool physHooked;
+	extern ICriticalSection data_Lock;
+	extern unordered_map<UInt64, PhysData> datamap;
 	hkVector4 GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit);
 	void HookSkyrimPhys();
 	PhysData* GetData(Actor* a);
