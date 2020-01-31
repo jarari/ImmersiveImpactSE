@@ -16,6 +16,7 @@ uintptr_t ptr_FrictionOverridePoint;
 uintptr_t ptr_OnGroundVelocityOverridePoint;
 uintptr_t ptr_AccelerationOverridePoint;
 uintptr_t ptr_EngineTick;
+uintptr_t ptr_GetMass;
 
 _SendNotification SendNotification_Fn;
 _Play_Native Play_Native;
@@ -24,6 +25,7 @@ _SetInstanceVolume_Native SetInstanceVolume_Native;
 _ShakeController ShakeController;
 _ShakeCamera_Native ShakeCamera_Native;
 _ApplyImageSpaceModifier ApplyImageSpaceModifier;
+_GetMass GetMass;
 
 AddressManager* AddressManager::instance = nullptr;
 
@@ -88,6 +90,10 @@ void AddressManager::FindAddresses() {
 	uintptr_t engineTickOffset = ptr_AccelerationOverridePoint - 0x78;
 	ptr_EngineTick = (engineTickOffset + *(UInt32*)(engineTickOffset + 0x4)) + 0x8;
 	_MESSAGE("Engine Tick %llx", ptr_EngineTick);
+
+	ptr_GetMass = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0x20, 0x0F, 0x57, 0xF6, 0x48, 0x8B, 0xD9}) - 0xA;
+	_MESSAGE("Function - GetMass %llx", ptr_GetMass);
+	GetMass = (_GetMass)ptr_GetMass;
 
 	delete(mr);
 }

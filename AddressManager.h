@@ -20,6 +20,7 @@ extern uintptr_t ptr_FrictionOverridePoint;
 extern uintptr_t ptr_OnGroundVelocityOverridePoint;
 extern uintptr_t ptr_AccelerationOverridePoint;
 extern uintptr_t ptr_EngineTick;
+extern uintptr_t ptr_GetMass;
 
 typedef void (*_SendNotification)(const char* str);
 extern _SendNotification SendNotification_Fn;
@@ -41,6 +42,9 @@ extern _ShakeCamera_Native ShakeCamera_Native;
 
 typedef void (*_ApplyImageSpaceModifier)(TESImageSpaceModifier* modifier, float strength, void* null);
 extern _ApplyImageSpaceModifier ApplyImageSpaceModifier;
+
+typedef float (*_GetMass)(NiNode* obj);
+extern _GetMass GetMass;
 
 class AddressManager {
 	static AddressManager* instance;
