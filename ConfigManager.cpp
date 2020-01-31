@@ -126,8 +126,8 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("HitBlur_2H_Duration", 0.35f));
 
 	physconfigs.clear();
-	physconfigs.push_back(Config("Tick", 0.016667f));
-	physconfigs.push_back(Config("DefaultFriction", 0.75f));
+	physconfigs.push_back(Config("Tick", 0.016666f));
+	physconfigs.push_back(Config("DefaultFriction", 1.0f));
 	physconfigs.push_back(Config("DefaultAirDrag", 1.0f));
 }
 
