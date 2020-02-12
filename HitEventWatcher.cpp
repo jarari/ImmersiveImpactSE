@@ -16,6 +16,7 @@
 
 std::string HitEventWatcher::className = "HitEventWatcher";
 HitEventWatcher* HitEventWatcher::instance = nullptr;
+unordered_map<TESObjectREFR*, unordered_map<TESObjectREFR*, std::chrono::system_clock::time_point>> HitEventWatcher::lastHitEvent;
 std::random_device rd;
 
 void HookDamageCalculation() {
@@ -86,6 +87,11 @@ void HitEventWatcher::InitWatcher() {
 }
 
 EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESHitEvent>* src) {
+	std::chrono::system_clock::time_point last = lastHitEvent[evn->caster][evn->target];
+	lastHitEvent[evn->caster][evn->target] = std::chrono::system_clock::now();
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - last).count() < 15) {
+		return kEvent_Continue;
+	}
 	HitStopManager::EvaluateEvent(evn);
 	if (!evn->target || evn->target->formType != kFormType_Character || !evn->caster || evn->caster->formType != kFormType_Character)
 		return kEvent_Continue;

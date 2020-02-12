@@ -6,6 +6,7 @@
 #include <Psapi.h>
 #include <unordered_map>
 #include "HitEventTask.h"
+#include "HitEventWatcher.h"
 #include "WeaponSpeedManager.h"
 #include "ConfigManager.h"
 using std::unordered_map;
@@ -109,6 +110,7 @@ EventResult MenuWatcher::ReceiveEvent(MenuOpenCloseEvent* evn, EventDispatcher<M
 			ConfigManager::GetInstance()->LoadConfigs();
 			HitEventPool::ResetPool();
 			StaggerPool::ResetPool();
+			HitEventWatcher::ResetEventTimer();
 			PhysicsManager::ResetPhysics();
 			WeaponSpeedManager::ResetRestraintChecker();
 		}

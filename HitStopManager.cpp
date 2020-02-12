@@ -11,6 +11,7 @@
 #include <thread>
 using std::thread;
 TESImageSpaceModifier* HitStopManager::blurModifier;
+std::chrono::system_clock::time_point HitStopManager::lastEffect = std::chrono::system_clock::now();
 ICriticalSection HitStopThreadManager::threadQueue_Lock;
 ICriticalSection HitStopThreadManager::gamePause_Lock;
 bool HitStopThreadManager::running;
@@ -76,6 +77,11 @@ void HitStopManager::UnleashCameraShakeLimit() {
 }
 
 void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
+	std::chrono::system_clock::time_point last = lastEffect;
+	lastEffect = std::chrono::system_clock::now();
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - last).count() < 15) {
+		return;
+	}
 	PlayerCharacter* pc = *g_thePlayer;
 
 	TESObjectWEAP* wep = (TESObjectWEAP*)LookupFormByID(evn->sourceFormID);

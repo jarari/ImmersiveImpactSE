@@ -10,6 +10,7 @@ struct TESHitEvent;
 class TESImageSpaceModifier;
 namespace HitStopManager {
 	extern TESImageSpaceModifier* blurModifier;
+	extern std::chrono::system_clock::time_point lastEffect;
 	void FindBlurEffect();
 	void UnleashCameraShakeLimit();
 	void EvaluateEvent(TESHitEvent* evn);
