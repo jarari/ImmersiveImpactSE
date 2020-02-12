@@ -84,7 +84,6 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 
 	bool powerattack = (evn->flags & TESHitEvent::kFlag_PowerAttack) == TESHitEvent::kFlag_PowerAttack;
 	bool bash = (evn->flags & TESHitEvent::kFlag_Bash) == TESHitEvent::kFlag_Bash;
-	float strengthMul = powerattack + 1.0f;
 	if ((wep->type() == TESObjectWEAP::GameData::kType_Bow
 		 || wep->type() == TESObjectWEAP::GameData::kType_Bow2
 		 || wep->type() == TESObjectWEAP::GameData::kType_CrossBow
@@ -130,6 +129,7 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 			((evn->target && evn->target->formType != kFormType_Character || !evn->target) && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitShakeController_OnObjectHit].value)) {
 			float mag;
 			float dur;
+			float strengthMul = powerattack ? ConfigManager::GetConfig()[iConfigType::HitShakeController_PowerAttackMult].value : 1.0f;
 			switch (weptype) {
 				case iWepType::Fist:
 					mag = ConfigManager::GetConfig()[iConfigType::HitShakeController_Fist].value * strengthMul;
@@ -160,6 +160,7 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 			if (registry) {
 				float mag;
 				float dur;
+				float strengthMul = powerattack ? ConfigManager::GetConfig()[iConfigType::HitShakeCam_PowerAttackMult].value : 1.0f;
 				switch (weptype) {
 					case iWepType::Fist:
 						mag = ConfigManager::GetConfig()[iConfigType::HitShakeCam_Fist].value * strengthMul;
@@ -189,6 +190,7 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 			((evn->target && evn->target->formType != kFormType_Character || !evn->target) && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitBlur_OnObjectHit].value)) {
 			float mag;
 			float dur;
+			float strengthMul = powerattack ? ConfigManager::GetConfig()[iConfigType::HitBlur_PowerAttackMult].value : 1.0f;
 			switch (weptype) {
 				case iWepType::Fist:
 					mag = ConfigManager::GetConfig()[iConfigType::HitBlur_Fist].value * strengthMul;

@@ -92,6 +92,7 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("HitStop_Sync1H", 0.075f));
 	configs.push_back(Config("HitStop_Sync2H", 0.1f));
 	configs.push_back(Config("EnableHitShakeController", 0));
+	configs.push_back(Config("HitShakeController_PowerAttackMult", 2.0f));
 	configs.push_back(Config("HitShakeController_OnPlayerHit", 1));
 	configs.push_back(Config("HitShakeController_OnObjectHit", 1));
 	configs.push_back(Config("HitShakeController_Fist", 0.3f));
@@ -103,6 +104,7 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("HitShakeController_2H", 0.5f));
 	configs.push_back(Config("HitShakeController_2H_Duration", 0.35f));
 	configs.push_back(Config("EnableHitShakeCam", 0));
+	configs.push_back(Config("HitShakeCam_PowerAttackMult", 2.0f));
 	configs.push_back(Config("HitShakeCam_OnPlayerHit", 1));
 	configs.push_back(Config("HitShakeCam_OnObjectHit", 1));
 	configs.push_back(Config("HitShakeCam_Fist", 0.3f));
@@ -114,6 +116,7 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("HitShakeCam_2H", 0.5f));
 	configs.push_back(Config("HitShakeCam_2H_Duration", 0.35f));
 	configs.push_back(Config("EnableHitBlur", 0));
+	configs.push_back(Config("HitBlur_PowerAttackMult", 2.0f));
 	configs.push_back(Config("HitBlur_OnPlayerHit", 1));
 	configs.push_back(Config("HitBlur_OnObjectHit", 1));
 	configs.push_back(Config("HitBlur_Fist", 0.3f));
