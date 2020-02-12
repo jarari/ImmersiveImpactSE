@@ -14,7 +14,7 @@ unordered_map<UInt64, PhysData> PhysicsManager::datamap;
 typedef bool (*_GetVelocity)(bhkCharacterController* con, const hkVector4& vel);
 typedef bool (*_SetVelocity)(bhkCharacterController* con, const hkVector4& vel);
 
-hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit) {
+hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit, bool local) {
 	Actor* a = (Actor*)(**(UInt64 **)((UInt64)cCon + 0x10) - 0xD0);
 	_GetVelocity GetVelocity = *(_GetVelocity*)(*(UInt64*)cCon + 0x30);
 	if (datamap.count((UInt64)a)) {
@@ -23,11 +23,12 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 			return hkVector4(1.0f, 1.0f, 1.0f);
 		hkVector4 curr = hkVector4(0, 0, 0);
 		GetVelocity(cCon, curr);
-		hkVector4 currLocal = Utils::WorldToLocal(curr, NiPoint3(), Utils::GetRotationMatrix33(0, -a->rot.z, 0));
+		if (local)
+			curr = Utils::WorldToLocal(curr, NiPoint3(), Utils::GetRotationMatrix33(0, -a->rot.z, 0));
 		hkVector4 mult = hkVector4(1.0f, 1.0f, 1.0f);
 		if (limit.x != 0) {
-			if (currLocal.x * limit.x >= 0) { //same sign
-				mult.x = max(abs(limit.x) - abs(currLocal.x), 0) / abs(limit.x);
+			if (curr.x * limit.x >= 0) { //same sign
+				mult.x = max(abs(limit.x) - abs(curr.x), 0) / abs(limit.x);
 			}
 			else {
 				mult.x = 1.0f;
@@ -37,8 +38,8 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 			mult.x = 0;
 		}
 		if (limit.y != 0) {
-			if (currLocal.y * limit.y >= 0) {
-				mult.y = max(abs(limit.y) - abs(currLocal.y), 0) / abs(limit.y);
+			if (curr.y * limit.y >= 0) {
+				mult.y = max(abs(limit.y) - abs(curr.y), 0) / abs(limit.y);
 			}
 			else {
 				mult.y = 1.0f;
@@ -48,8 +49,8 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 			mult.y = 0;
 		}
 		if (limit.z != 0) {
-			if (currLocal.z * limit.z >= 0) {
-				mult.z = max(abs(limit.z) - abs(currLocal.z), 0) / abs(limit.z);
+			if (curr.z * limit.z >= 0) {
+				mult.z = max(abs(limit.z) - abs(curr.z), 0) / abs(limit.z);
 			}
 			else {
 				mult.z = 1.0f;
@@ -65,7 +66,9 @@ hkVector4 PhysicsManager::GetAccelerationMultiplier(bhkCharacterController* cCon
 }
 
 void PhysicsManager::HookSkyrimPhys() {
-	_MESSAGE("Dash or knockback enabled. Replacing Skyrim physics."); struct InstallHookAcceleration_Code : Xbyak::CodeGenerator {
+	_MESSAGE("Dash or knockback enabled. Replacing Skyrim physics."); 
+	uintptr_t getAccelMul = GetFnAddr(PhysicsManager::GetAccelerationMultiplier);
+	struct InstallHookAcceleration_Code : Xbyak::CodeGenerator {
 		InstallHookAcceleration_Code(void* buf, uintptr_t getAccelMul) : Xbyak::CodeGenerator(4096, buf) {
 			mulss(xmm7, xmm0);	//x
 			mulss(xmm8, xmm0);	//y
@@ -79,28 +82,30 @@ void PhysicsManager::HookSkyrimPhys() {
 			push(r10);
 			push(r11);
 			lahf();
-			lea(rsp, ptr[rsp - 0x208]);
-			mov(ptr[rsp + 0x150], ah);
-			movaps(ptr[rsp + 0x160], xmm1);
-			movaps(ptr[rsp + 0x170], xmm2);
-			movaps(ptr[rsp + 0x180], xmm3);
-			movaps(ptr[rsp + 0x190], xmm5);
-			movss(ptr[rsp + 0x140], xmm7);
-			movss(ptr[rsp + 0x144], xmm8);
-			movss(ptr[rsp + 0x148], xmm6);
-			lea(r8, ptr[rsp + 0x140]);
+			lea(rsp, ptr[rsp - 0x128]);
+			mov(ptr[rsp + 0xB0], ah);
+			movaps(ptr[rsp + 0xC0], xmm1);
+			movaps(ptr[rsp + 0xD0], xmm2);
+			movaps(ptr[rsp + 0xE0], xmm3);
+			movaps(ptr[rsp + 0xF0], xmm5);
+			movss(ptr[rsp + 0x100], xmm7);
+			movss(ptr[rsp + 0x104], xmm8);
+			movss(ptr[rsp + 0x108], xmm6);
+			mov(r9, 0x1);
+			lea(r8, ptr[rsp + 0x100]);
 			mov(rdx, rsi);
+			lea(rcx, ptr[rsp + 0xA0]);
 			mov(rax, getAccelMul);
 			call(rax);
 			mulss(xmm7, dword[rax]);
 			mulss(xmm8, dword[rax + 0x4]);
 			mulss(xmm6, dword[rax + 0x8]);
-			movaps(xmm1, ptr[rsp + 0x160]);
-			movaps(xmm2, ptr[rsp + 0x170]);
-			movaps(xmm3, ptr[rsp + 0x180]);
-			movaps(xmm5, ptr[rsp + 0x190]);
-			mov(ah, ptr[rsp + 0x150]);
-			lea(rsp, ptr[rsp + 0x208]);
+			movaps(xmm1, ptr[rsp + 0xC0]);
+			movaps(xmm2, ptr[rsp + 0xD0]);
+			movaps(xmm3, ptr[rsp + 0xE0]);
+			movaps(xmm5, ptr[rsp + 0xF0]);
+			mov(ah, ptr[rsp + 0xB0]);
+			lea(rsp, ptr[rsp + 0x128]);
 			sahf();
 			pop(r11);
 			pop(r10);
@@ -118,10 +123,66 @@ void PhysicsManager::HookSkyrimPhys() {
 		}
 	};
 	void* codeBuf = g_localTrampoline.StartAlloc();
-	InstallHookAcceleration_Code code(codeBuf, GetFnAddr(PhysicsManager::GetAccelerationMultiplier));
+	InstallHookAcceleration_Code code(codeBuf, getAccelMul);
 	g_localTrampoline.EndAlloc(code.getCurr());
 
 	if (!g_branchTrampoline.Write5Branch(ptr_AccelerationOverridePoint, uintptr_t(code.getCode())))
+		return;
+
+	struct InstallHookAddVelocity_Code : Xbyak::CodeGenerator {
+		InstallHookAddVelocity_Code(void* buf, uintptr_t getAccelMul) : Xbyak::CodeGenerator(4096, buf) {
+
+			push(rax);
+			push(rcx);
+			push(rdx);
+			push(r8);
+			push(r9);
+			push(r10);
+			push(r11);
+			lahf();
+			lea(rsp, ptr[rsp - 0x100]);
+			mov(ptr[rsp + 0x90], ah);
+			movaps(ptr[rsp + 0xA0], xmm1);
+			movaps(ptr[rsp + 0xB0], xmm2);
+			movaps(ptr[rsp + 0xC0], xmm3);
+			movaps(ptr[rsp + 0xD0], xmm4);
+			movaps(ptr[rsp + 0xE0], xmm5);
+			movaps(ptr[rsp + 0x80], xmm0);
+			mov(r9, 0x0);
+			lea(r8, ptr[rsp + 0x80]);
+			mov(rdx, rcx);
+			lea(rcx, ptr[rsp + 0x70]);
+			mov(rax, getAccelMul);
+			call(rax);
+			movaps(xmm0, ptr[rsp + 0x80]);
+			mulps(xmm0, ptr[rax]);
+
+			mov(ah, ptr[rsp + 0x90]);
+			movaps(xmm1, ptr[rsp + 0xA0]);
+			movaps(xmm2, ptr[rsp + 0xB0]);
+			movaps(xmm3, ptr[rsp + 0xC0]);
+			movaps(xmm4, ptr[rsp + 0xD0]);
+			movaps(xmm5, ptr[rsp + 0xE0]);
+			lea(rsp, ptr[rsp + 0x100]);
+			sahf();
+			pop(r11);
+			pop(r10);
+			pop(r9);
+			pop(r8);
+			pop(rdx);
+			pop(rcx);
+			pop(rax);
+
+			addps(xmm0, ptr[rcx + 0x90]);
+			movaps(ptr[rcx + 0x90], xmm0);
+			ret();
+		}
+	};
+	void* codeBuf2 = g_localTrampoline.StartAlloc();
+	InstallHookAddVelocity_Code code2(codeBuf2, getAccelMul);
+	g_localTrampoline.EndAlloc(code2.getCurr());
+
+	if (!g_branchTrampoline.Write5Branch(ptr_AddVelocityOverridePoint, uintptr_t(code2.getCode())))
 		return;
 
 	SafeWrite8(ptr_FrictionOverridePoint, 0x90);

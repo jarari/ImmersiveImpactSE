@@ -16,7 +16,8 @@ uintptr_t ptr_FrictionOverridePoint;
 uintptr_t ptr_OnGroundVelocityOverridePoint;
 uintptr_t ptr_AccelerationOverridePoint;
 uintptr_t ptr_EngineTick;
-uintptr_t ptr_GetMass;
+uintptr_t ptr_GetMass; 
+uintptr_t ptr_AddVelocityOverridePoint;
 
 _SendNotification SendNotification_Fn;
 _Play_Native Play_Native;
@@ -94,6 +95,9 @@ void AddressManager::FindAddresses() {
 	ptr_GetMass = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0x20, 0x0F, 0x57, 0xF6, 0x48, 0x8B, 0xD9}) - 0xA;
 	_MESSAGE("Function - GetMass %llx", ptr_GetMass);
 	GetMass = (_GetMass)ptr_GetMass;
+
+	ptr_AddVelocityOverridePoint = PatternScanner::PatternScanInternal(mr, vector<BYTE>{0x76, 0x29, 0xF7, 0x81, 0x18}) + 0x1C;
+	_MESSAGE("AddVelocity Override Point %llx", ptr_AddVelocityOverridePoint);
 
 	delete(mr);
 }

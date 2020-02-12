@@ -152,7 +152,7 @@ namespace PhysicsManager {
 	extern bool physHooked;
 	extern ICriticalSection data_Lock;
 	extern unordered_map<UInt64, PhysData> datamap;
-	hkVector4 GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit);
+	hkVector4 GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit, bool local);
 	void HookSkyrimPhys();
 	PhysData* GetData(Actor* a);
 	void AddVelocity(Actor* a, hkVector4 vel);
