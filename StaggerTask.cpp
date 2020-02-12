@@ -24,16 +24,24 @@ void StaggerTask::Run() {
 	counter++;
 	if (counter <= 2)
 		return;
+	if (!target ||
+		(attacker && ActorManager::IsInKillmove(attacker)) || //killmove
+		ActorManager::IsInKillmove(target) || //killmove
+		target->IsDead(1)) {
+		taskran = true;
+		return;
+	}
 	bool isStaggering = false;
 	bool dontMove = (target->actorState.flags04 & 0x1200000) == 0x1200000;
 	bool isBleedingOut = false;
 	((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->GetAnimationVariableBool("IsStaggering", isStaggering);
 	((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->GetAnimationVariableBool("IsBleedingOut", isBleedingOut);
-	if ((isStaggering && counter < 9) || dontMove || isBleedingOut || !target ||
-		(attacker && ActorManager::IsInKillmove(attacker)) || //killmove
-		ActorManager::IsInKillmove(target) || //killmove
-		target->IsDead(1))
+	if ((isStaggering && counter < 9))
 		return;
+	else if (dontMove || isBleedingOut) {
+		taskran = true;
+		return;
+	}
 	SetAnimationVariableFloat(& target->animGraphHolder, "staggerDirection", dir);
 	SetAnimationVariableFloat(& target->animGraphHolder, "staggerMagnitude", mag);
 	((IAnimationGraphManagerHolderEx*)& target->animGraphHolder)->SendAnimationEvent("staggerStart");

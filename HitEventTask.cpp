@@ -10,6 +10,7 @@
 #include <skse64\GameReferences.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "Utils.h"
 IThreadSafeBasicMemPool<HitEventTask, 256>	s_HitEventTaskDelegatePool;
 
 HitEventTask* HitEventTask::Create(Actor* target, Actor* attacker, ActiveEffect* ae, float staggerMul, bool isArrow, int wepType) {
@@ -41,7 +42,7 @@ void HitEventTask::Run() {
 		target->IsDead(1) ||
 		damage > -0.5f)
 		return;
-	if (ae->magnitude >= ConfigManager::GetConfig()[iConfigType::StaggerLimit].value) {
+	if (!ae || ae->magnitude >= ConfigManager::GetConfig()[iConfigType::StaggerLimit].value) {
 		return;
 	}
 	else {
