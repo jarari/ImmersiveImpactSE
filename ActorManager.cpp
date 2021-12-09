@@ -1,5 +1,7 @@
 #include "ActorManager.h"
 #include "AddressManager.h"
+#include "AnimEventWatcher.h"
+#include "CharacterMoveEventWatcher.h"
 #include "ModifiedSKSE.h"
 #include "Utils.h"
 #include <skse64\GameCamera.h>
@@ -11,6 +13,13 @@ TESSound* ActorManager::deflectSound;
 
 bool isRidingHorse(Actor* a) {
 	return (a->actorState.flags04 & (3 << 14));
+}
+
+void ActorManager::HookEvents() {
+	AnimEventWatcher::HookSink(ptr_PCAnimEventReceiveEvent);
+	CharacterMoveEventWatcher::HookSink(ptr_PCMoveEventReceiveEvent);
+	AnimEventWatcher::HookSink(ptr_CAnimEventReceiveEvent);
+	CharacterMoveEventWatcher::HookSink(ptr_CMoveEventReceiveEvent);
 }
 
 void ActorManager::FindDeflectSound() {

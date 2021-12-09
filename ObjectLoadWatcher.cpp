@@ -6,7 +6,6 @@
 #include "Utils.h"
 #include <skse64\GameReferences.h>
 #include <skse64\GameRTTI.h>
-#include <typeinfo.h>
 
 std::string ObjectLoadWatcher::className = "ObjectLoadWatcher";
 ObjectLoadWatcher* ObjectLoadWatcher::instance = nullptr;
@@ -20,10 +19,8 @@ void ObjectLoadWatcher::InitWatcher() {
 void HookWatchers(Actor* a) {
 	AnimEventWatcher* ae = static_cast<AnimEventWatcher*>(&a->animGraphEventSink);
 	ae->HookSink();
-	if (PhysicsManager::physHooked) {
-		CharacterMoveEventWatcher* cme = (CharacterMoveEventWatcher*)(&a->characterMoveFinishEvent);
-		cme->HookSink();
-	}
+	CharacterMoveEventWatcher* cme = (CharacterMoveEventWatcher*)(&a->characterMoveFinishEvent);
+	cme->HookSink();
 }
 
 bool ActorHooked = false;

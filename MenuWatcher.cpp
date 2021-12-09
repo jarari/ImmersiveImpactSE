@@ -101,17 +101,16 @@ EventResult MenuWatcher::ReceiveEvent(MenuOpenCloseEvent* evn, EventDispatcher<M
 	UIStringHolder* uistr = UIStringHolder::GetSingleton();
 	if (evn->menuName == uistr->loadingMenu) {
 		if (!evn->opening) {
-			if (!mm->IsMenuOpen(&BSFixedString("BingleStaggerHelper"))) {
-				CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleStaggerHelper"), UIMessage::kMessage_Open, nullptr);
-				_MESSAGE("Helper created");
-			}
+			PhysicsManager::Reset();
 		}
 		else if (evn->opening) {
+			if (!mm->IsMenuOpen(&BSFixedString("BingleStaggerHelper"))) {
+				CALL_MEMBER_FN(ui, AddMessage)(&BSFixedString("BingleStaggerHelper"), UIMessage::kMessage_Open, nullptr);
+			}
 			ConfigManager::GetInstance()->LoadConfigs();
 			HitEventPool::ResetPool();
 			StaggerPool::ResetPool();
 			HitEventWatcher::ResetEventTimer();
-			PhysicsManager::ResetPhysics();
 			WeaponSpeedManager::ResetRestraintChecker();
 		}
 	}

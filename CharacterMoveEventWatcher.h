@@ -17,7 +17,7 @@ struct bhkCharacterMoveFinishEvent {
 	float unk20;	//20
 };
 
-class CharacterMoveEventWatcher : public BSTEventSink<bhkCharacterMoveFinishEvent> {
+class CharacterMoveEventWatcher {
 public:
 	typedef EventResult (CharacterMoveEventWatcher::* FnReceiveEvent)(bhkCharacterMoveFinishEvent* evn, EventDispatcher<bhkCharacterMoveFinishEvent>* dispatcher);
 	CharacterMoveEventWatcher() {
@@ -26,7 +26,7 @@ public:
 
 	EventResult ReceiveEventHook(bhkCharacterMoveFinishEvent* evn, EventDispatcher<bhkCharacterMoveFinishEvent>* src);
 
-	void HookSink();
+	static void HookSink(uintptr_t ptr);
 
 protected:
 	static std::string className;

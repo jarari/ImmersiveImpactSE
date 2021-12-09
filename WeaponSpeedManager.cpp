@@ -90,12 +90,11 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn, bool delayed) {
 			}
 		}
 		else if (evn == iSwingState::Swing) {
-			if (ConfigManager::GetConfig()[iConfigType::EnableDash].value && weptype_r != iWepType::None && !ActorManager::IsInKillmove(a)) {
+			if (ConfigManager::GetConfig()[iConfigType::EnableDash].value && weptype_r != iWepType::None && PhysicsManager::IsOnGround(a) && !ActorManager::IsInKillmove(a)) {
 				NiPoint3 fwd;
 				Utils::GetRefForward(-a->rot.x, -a->rot.z, 0, &fwd);
 				fwd *= ConfigManager::GetConfig()[iConfigType::Dash_Fist + weptype_r].value;
-				PhysicsManager::AddVelocity((Character*)a, hkVector4(fwd));
-				PhysicsManager::SetFriction((Character*)a, PhysicsManager::defaultFriction / 2.0f);
+				PhysicsManager::SetVelocity((Character*)a, fwd, hkVector4(), ConfigManager::GetConfig()[iConfigType::Dash_Fist_Duration + weptype_r].value);
 			}
 		}
 		else if (evn == iSwingState::End) {
@@ -114,10 +113,10 @@ void WeaponSpeedManager::EvaluateEvent(Actor* a, int evn, bool delayed) {
 					papyrusActor::EquipItemEx(a, fist, 0, false, false);
 				}
 			}
-			if (ConfigManager::GetConfig()[iConfigType::EnableDash].value && !ActorManager::IsInKillmove(a)) {
+			/*if (ConfigManager::GetConfig()[iConfigType::EnableDash].value && !ActorManager::IsInKillmove(a)) {
 				PhysicsManager::SetFriction(a, PhysicsManager::defaultFriction);
 				PhysicsManager::SetDrag(a, PhysicsManager::defaultDrag);
-			}
+			}*/
 		}
 	}
 	if (!ConfigManager::GetConfig()[iConfigType::EnableWeaponSpeed].value

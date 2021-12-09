@@ -18,7 +18,7 @@ public:
 
 	EventResult ReceiveEventHook(BSAnimationGraphEvent* evn, EventDispatcher<BSAnimationGraphEvent>* src);
 
-	void HookSink();
+	static void HookSink(uintptr_t ptr);
 
 protected:
 	static std::string className;

@@ -6,7 +6,6 @@
 #include "HitEventTask.h"
 #include "HitStopManager.h"
 #include "MenuWatcher.h"
-#include "ObjectLoadWatcher.h"
 #include "PhysicsManager.h"
 #include "StaggerTask.h"
 #include "WeaponSpeedManager.h"
@@ -65,6 +64,7 @@ extern "C" {
 				ConfigManager::GetInstance()->UpdateINIWithCurrentValues();
 				AddressManager* am = new AddressManager();
 				am->FindAddresses();
+				ActorManager::HookEvents();
 				ActorManager::FindDeflectSound();
 				HitStopManager::FindBlurEffect();
 				HitStopManager::UnleashCameraShakeLimit();
@@ -72,9 +72,6 @@ extern "C" {
 				StaggerHelper::Register();
 				MenuWatcher::InitWatcher();
 				HitEventWatcher::InitWatcher();
-				ObjectLoadWatcher::InitWatcher();
-				if(ConfigManager::GetConfig()[iConfigType::EnableDash].value || ConfigManager::GetConfig()[iConfigType::EnableKnockback].value)
-					PhysicsManager::HookSkyrimPhys();
 				_MESSAGE("Player : %llx", *g_thePlayer);
 			}
 		});

@@ -29,7 +29,6 @@
     <ClCompile Include="HitStopManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MenuWatcher.cpp" />
-    <ClCompile Include="ObjectLoadWatcher.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="StaggerTask.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -39,7 +38,7 @@
     <ProjectReference Include="..\..\common\common_vc14.vcxproj">
       <Project>{472e19ab-def0-42df-819b-18722e8dc822}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\skse64_20017\skse64\skse64\skse64.vcxproj">
+    <ProjectReference Include="..\skse64\skse64.vcxproj">
       <Project>{7028b79c-06e3-4d9a-b38c-1dc3680b1bdb}</Project>
     </ProjectReference>
     <ProjectReference Include="..\skse64_common\skse64_common.vcxproj">
@@ -61,7 +60,6 @@
     <ClInclude Include="INILibrary\SimpleIni.h" />
     <ClInclude Include="MenuWatcher.h" />
     <ClInclude Include="ModifiedSKSE.h" />
-    <ClInclude Include="ObjectLoadWatcher.h" />
     <ClInclude Include="PatternScanner.h" />
     <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="StaggerTask.h" />
@@ -101,6 +99,7 @@
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -137,15 +136,14 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;IMMERSIVEIMPACT_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>common/IPrefix.h</ForcedIncludeFiles>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

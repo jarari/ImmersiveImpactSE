@@ -128,38 +128,29 @@ public:
 hkVector4 operator*(float a, hkVector4& v);
 
 class bhkCharacterController;
-struct PhysData {
-	float friction;
-	float airdrag;
-	std::chrono::system_clock::time_point lastRun;
+struct VelocityData {
 	hkVector4 velocity;
-	hkVector4 currentVelocity;
-	PhysData() {
-		lastRun = std::chrono::system_clock::now();
+	hkVector4 step;
+	float duration;
+	VelocityData() {
 		velocity = hkVector4();
-		currentVelocity = hkVector4();
+		step = hkVector4();
+		duration = 0.0f;
 	}
-	PhysData(float f, float d) : PhysData() {
-		friction = f;
-		airdrag = d;
+	VelocityData(hkVector4 _v, hkVector4 _s, float _d) {
+		velocity = _v;
+		step = _s;
+		duration = _d;
 	}
 };
 
 namespace PhysicsManager {
 	extern int tick;
-	extern float defaultFriction;
-	extern float defaultDrag;
-	extern bool physHooked;
-	extern ICriticalSection data_Lock;
-	extern unordered_map<UInt64, PhysData> datamap;
-	hkVector4 GetAccelerationMultiplier(bhkCharacterController* cCon, hkVector4 limit, bool local);
-	void HookSkyrimPhys();
-	PhysData* GetData(Actor* a);
-	void AddVelocity(Actor* a, hkVector4 vel);
-	void SetFriction(Actor* a, float f);
-	void SetDrag(Actor* a, float f);
+	extern unordered_map<Actor*, VelocityData> velMap;
+	extern unordered_map<Actor*, VelocityData> queueMap;
+	float ModifyVelocity(Actor* a, hkVector4 v, bool modifyState = false);
+	void SetVelocity(Actor* a, hkVector4 from, hkVector4 to, float dur);
 	bool Simulate(Actor* a);
-	void InitializeData(Actor* c);
-	void ResetPhysics();
-	void ResetTimer();
+	void Reset();
+	bool IsOnGround(Actor* a);
 }

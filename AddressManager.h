@@ -22,6 +22,10 @@ extern uintptr_t ptr_AccelerationOverridePoint;
 extern uintptr_t ptr_EngineTick;
 extern uintptr_t ptr_GetMass;
 extern uintptr_t ptr_AddVelocityOverridePoint;
+extern uintptr_t ptr_PCAnimEventReceiveEvent;
+extern uintptr_t ptr_PCMoveEventReceiveEvent;
+extern uintptr_t ptr_CAnimEventReceiveEvent;
+extern uintptr_t ptr_CMoveEventReceiveEvent;
 
 typedef void (*_SendNotification)(const char* str);
 extern _SendNotification SendNotification_Fn;

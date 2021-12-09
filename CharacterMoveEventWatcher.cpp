@@ -9,19 +9,17 @@
 std::string CharacterMoveEventWatcher::className = "CharacterMoveEventWatcher";
 unordered_map<UInt64, CharacterMoveEventWatcher::FnReceiveEvent> CharacterMoveEventWatcher::fnHash;
 
-void CharacterMoveEventWatcher::HookSink() {
-	FnReceiveEvent fn = Utils::SafeWrite64Alt(*(UInt64*)this + 0x8, &CharacterMoveEventWatcher::ReceiveEventHook);
-	fnHash.insert(std::pair<UInt64, FnReceiveEvent>(*(UInt64*)this, fn));
+void CharacterMoveEventWatcher::HookSink(uintptr_t ptr) {
+	FnReceiveEvent fn = Utils::SafeWrite64Alt(ptr + 0x8, &CharacterMoveEventWatcher::ReceiveEventHook);
+	fnHash.insert(std::pair<UInt64, FnReceiveEvent>(ptr, fn));
 	_MESSAGE("%s, To: %llx, FnNew : %llx, FnOld : %llx", (className + std::string(" hooked to the sink")).c_str(),
-			 *(UInt64*)this + 0x8, &CharacterMoveEventWatcher::ReceiveEventHook, fn);
+			 ptr + 0x8, &CharacterMoveEventWatcher::ReceiveEventHook, fn);
 }
 
 EventResult CharacterMoveEventWatcher::ReceiveEventHook(bhkCharacterMoveFinishEvent* evn, EventDispatcher<bhkCharacterMoveFinishEvent>* dispatcher) {
 	Actor* a = (Actor*)((UInt64)this - 0xD0);
-	if (a && a->loadedState && a->loadedState->node && !a->IsDead(1)) {
-		if (!PhysicsManager::Simulate(a)) {
-			PhysicsManager::InitializeData(a);
-		}
+	if (a) {
+		PhysicsManager::Simulate(a);
 	}
 
 	FnReceiveEvent fn = fnHash.at(*(UInt64*)this);

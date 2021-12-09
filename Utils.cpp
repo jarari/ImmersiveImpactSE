@@ -206,7 +206,7 @@ void Utils::SetInstanceVolume(UInt32 instance, float volume) {
 
 int Utils::GetWeaponType(TESObjectWEAP* wep) {
 	if(!wep)
-		return iWepType::None;
+		return iWepType::Fist;
 	int weptype = wep->type();
 	if (weptype == 5 || weptype == 6) {
 		return iWepType::TwoH;

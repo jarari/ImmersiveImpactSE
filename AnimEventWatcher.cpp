@@ -9,11 +9,11 @@
 std::string AnimEventWatcher::className = "AnimEventWatcher";
 unordered_map<UInt64, AnimEventWatcher::FnReceiveEvent> AnimEventWatcher::fnHash;
 
-void AnimEventWatcher::HookSink() {
-	FnReceiveEvent fn = Utils::SafeWrite64Alt(*(UInt64*)this + 0x8, &AnimEventWatcher::ReceiveEventHook);
-	fnHash.insert(std::pair<UInt64, FnReceiveEvent>(*(UInt64*)this, fn));
+void AnimEventWatcher::HookSink(uintptr_t ptr) {
+	FnReceiveEvent fn = Utils::SafeWrite64Alt(ptr + 0x8, &AnimEventWatcher::ReceiveEventHook);
+	fnHash.insert(std::pair<UInt64, FnReceiveEvent>(ptr, fn));
 	_MESSAGE("%s, To: %llx, FnNew : %llx, FnOld : %llx", (className + std::string(" hooked to the sink")).c_str(),
-			 *(UInt64*)this + 0x8, &AnimEventWatcher::ReceiveEventHook, fn);
+			 ptr + 0x8, &AnimEventWatcher::ReceiveEventHook, fn);
 }
 
 BSFixedString prehit = BSFixedString("preHitFrame");
@@ -25,14 +25,13 @@ BSFixedString winstartl = BSFixedString("AttackWinStartLeft");
 BSFixedString attackstop = BSFixedString("attackStop");
 BSFixedString bashstop = BSFixedString("bashStop");
 BSFixedString staggerstop = BSFixedString("staggerStop");
+BSFixedString paend = BSFixedString("PowerAttack_Start_end");
 EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, EventDispatcher<BSAnimationGraphEvent>* dispatcher) {
 	Actor* a = *(Actor * *)((UInt64)evn + 0x8);
 	/*if(a == *g_thePlayer)
 		_MESSAGE("Event : %llx, dispatcher: %llx, event name : %s, animGraphEventSink %llx", evn, dispatcher, evn->eventname, this);*/
 	if (strlen(evn->eventname) > 20){
-		std::string compare = "PowerAttack_Start_end";
-		compare[18] = evn->eventname[18];
-		if (evn->eventname == BSFixedString(compare.c_str())) {
+		if (evn->eventname == paend) {
 			WeaponSpeedManager::EvaluateEvent(a, iSwingState::PrePre, true);
 		}
 	}
@@ -61,8 +60,7 @@ EventResult AnimEventWatcher::ReceiveEventHook(BSAnimationGraphEvent* evn, Event
 		WeaponSpeedManager::EvaluateEvent(a, iSwingState::End);
 	}
 	else if (evn->eventname == staggerstop) {
-		PhysicsManager::SetFriction(a, PhysicsManager::defaultFriction);
-		PhysicsManager::SetDrag(a, PhysicsManager::defaultDrag);
+		WeaponSpeedManager::ResetRestraintChecker();
 	}
 	FnReceiveEvent fn = fnHash.at(*(UInt64*)this);
 	return fn ? (this->*fn)(evn, dispatcher) : kEvent_Continue;

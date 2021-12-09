@@ -2,8 +2,12 @@
 #include <common\IDebugLog.h>
 #include <Psapi.h>
 #include <vector>
+#include <unordered_map>
 #pragma comment(lib, "Psapi.lib")
 using std::vector;
+using std::unordered_map;
+using std::string;
+using std::pair;
 
 struct MemoryRegion {
 public:
@@ -37,13 +41,16 @@ namespace PatternScanner {
 		mr->Set((uintptr_t)handle, mi.SizeOfImage);
 	}
 
-	uintptr_t PatternScanInternal(MemoryRegion* r, vector<BYTE> pattern, bool useMask = false, BYTE mask = '\x00') {
+	unordered_map<string, uintptr_t> PatternScanInternal(MemoryRegion* r, unordered_map<string, vector<BYTE>> pattern, bool useMask = false, BYTE mask = '\x00') {
+		unordered_map<string, uintptr_t> ret;
 		size_t len = pattern.size();
 		BYTE* end = (BYTE*)r->base + r->size - len;
 		for (BYTE* addr = (BYTE*)r->base; addr < end; addr++) {
-			if (CompareBytes(addr, pattern, useMask, mask))
-				return (uintptr_t)addr;
+			for (auto it = pattern.begin(); it != pattern.end(); ++it) {
+				if (CompareBytes(addr, it->second, useMask, mask))
+					ret.insert(pair<string, uintptr_t>(it->first, (uintptr_t)addr));
+			}
 		}
-		return -1;
+		return ret;
 	}
 }

@@ -27,9 +27,6 @@
     <ClCompile Include="Utils.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectLoadWatcher.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="WeaponSpeedManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -77,9 +74,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="HitEventWatcher.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectLoadWatcher.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="WeaponSpeedManager.h">

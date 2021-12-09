@@ -57,9 +57,9 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("Speed_2H_PowerAttack_Hit", 1.8f));
 	configs.push_back(Config("Speed_2H_PowerAttack_End", 0.7f));
 	configs.push_back(Config("FakeFist", 0));
-	configs.push_back(Config("RestrainMovement", 1));
-	configs.push_back(Config("RestrainAim", 1));
-	configs.push_back(Config("EnableHitFeedback", 1));
+	configs.push_back(Config("RestrainMovement", 1.0f));
+	configs.push_back(Config("RestrainAim", 1.0f));
+	configs.push_back(Config("EnableHitFeedback", 1.0f));
 	configs.push_back(Config("DeflectChanceMul", 10.0f));
 	configs.push_back(Config("DeflectChanceMax", 50.0f));
 	configs.push_back(Config("StaggerResetTime", 2.0f));
@@ -69,16 +69,24 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("StaggerArmorCap", 300.0f));
 	configs.push_back(Config("StaggerIgnoreArrow", 1));
 	configs.push_back(Config("EnableKnockback", 0));
-	configs.push_back(Config("Knockback_Fist", 10.0f));
-	configs.push_back(Config("Knockback_Dagger", 5.0f));
-	configs.push_back(Config("Knockback_1H", 10.0f));
-	configs.push_back(Config("Knockback_2H", 15.0f));
+	configs.push_back(Config("Knockback_Fist", 120.0f));
+	configs.push_back(Config("Knockback_Dagger", 110.0f));
+	configs.push_back(Config("Knockback_1H", 125.0f));
+	configs.push_back(Config("Knockback_2H", 130.0f));
+	configs.push_back(Config("Knockback_Fist_Duration", 0.5f));
+	configs.push_back(Config("Knockback_Dagger_Duration", 0.3f));
+	configs.push_back(Config("Knockback_1H_Duration", 0.4f));
+	configs.push_back(Config("Knockback_2H_Duration", 0.6f));
 	configs.push_back(Config("Knockback_LastMultiplier", 1.5f));
 	configs.push_back(Config("EnableDash", 0));
-	configs.push_back(Config("Dash_Fist", 20.0f));
-	configs.push_back(Config("Dash_Dagger", 15.0f));
-	configs.push_back(Config("Dash_1H", 20.0f));
-	configs.push_back(Config("Dash_2H", 30.0f));
+	configs.push_back(Config("Dash_Fist", 120.0f));
+	configs.push_back(Config("Dash_Dagger", 110.0f));
+	configs.push_back(Config("Dash_1H", 110.0f));
+	configs.push_back(Config("Dash_2H", 120.0f));
+	configs.push_back(Config("Dash_Fist_Duration", 0.35f));
+	configs.push_back(Config("Dash_Dagger_Duration", 0.25f));
+	configs.push_back(Config("Dash_1H_Duration", 0.3f));
+	configs.push_back(Config("Dash_2H_Duration", 0.4f));
 	configs.push_back(Config("EnableHitStop", 0));
 	configs.push_back(Config("HitStop_OnPlayerHit", 0));
 	configs.push_back(Config("HitStop_OnObjectHit", 0));
@@ -129,9 +137,7 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("HitBlur_2H_Duration", 0.35f));
 
 	physconfigs.clear();
-	physconfigs.push_back(Config("Tick", 0.016666f));
-	physconfigs.push_back(Config("DefaultFriction", 1.0f));
-	physconfigs.push_back(Config("DefaultAirDrag", 1.0f));
+	physconfigs.push_back(Config("Tick", 1.0f/60.0f));
 }
 
 void ConfigManager::InitializeINI() {
@@ -174,8 +180,6 @@ void ConfigManager::LoadConfigs() {
 		physconfigs[i].value = std::stof(ini.GetValue("Phys", physconfigs[i].name, f2c, NULL));
 	}
 	PhysicsManager::tick = physconfigs[0].value * 1000000;
-	PhysicsManager::defaultFriction = physconfigs[1].value;
-	PhysicsManager::defaultDrag = physconfigs[2].value;
 }
 
 void ConfigManager::UpdateINIWithCurrentValues() {
