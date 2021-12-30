@@ -59,7 +59,7 @@ void HitStopManager::FindBlurEffect() {
 	const ModInfo* iimpt = dh->LookupModByName("ImmersiveImpact.esp");
 	if (!iimpt)
 		_MESSAGE("ImmersiveImpact.esp not found!");
-	blurModifier = (TESImageSpaceModifier*)LookupFormByID(iimpt->GetFormID(0x0000A42E));
+	blurModifier = (TESImageSpaceModifier*)LookupFormByID(iimpt->GetFormID(0x805));
 	if (blurModifier)
 		_MESSAGE("Found the blur modifier at %llx", blurModifier);
 }
@@ -104,28 +104,31 @@ void HitStopManager::EvaluateEvent(TESHitEvent* evn) {
 		if ((evn->target && evn->target->formType == kFormType_Character && evn->caster == pc && evn->target != pc) ||
 			(evn->target && evn->target == pc && ConfigManager::GetConfig()[iConfigType::HitStop_OnPlayerHit].value) ||
 			((evn->target && evn->target->formType != kFormType_Character || !evn->target) && evn->caster == pc && ConfigManager::GetConfig()[iConfigType::HitStop_OnObjectHit].value)) {
-			thread* t;
-			void (*threadFunc)(int, int) = HitStopThreadFunc;
-			switch (weptype) {
-				case iWepType::Fist:
-					t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_Fist].value * 1000),
-								   floor(ConfigManager::GetConfig()[iConfigType::HitStop_SyncFist].value * 1000));
-					break;
-				case iWepType::Dagger:
-					t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_Dagger].value * 1000),
-								   floor(ConfigManager::GetConfig()[iConfigType::HitStop_SyncDagger].value * 1000));
-					break;
-				case iWepType::OneH:
-					t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_1H].value * 1000),
-								   floor(ConfigManager::GetConfig()[iConfigType::HitStop_Sync1H].value * 1000));
-					break;
-				case iWepType::TwoH:
-					t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_2H].value * 1000),
-								   floor(ConfigManager::GetConfig()[iConfigType::HitStop_Sync2H].value * 1000));
-					break;
+			bool paOnly = ConfigManager::GetConfig()[iConfigType::HitStop_OnPowerAttackOnly].value > 0;
+			if (!paOnly || (paOnly && powerattack)) {
+				thread* t;
+				void (*threadFunc)(int, int) = HitStopThreadFunc;
+				switch (weptype) {
+					case iWepType::Fist:
+						t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_Fist].value * 1000),
+									   floor(ConfigManager::GetConfig()[iConfigType::HitStop_SyncFist].value * 1000));
+						break;
+					case iWepType::Dagger:
+						t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_Dagger].value * 1000),
+									   floor(ConfigManager::GetConfig()[iConfigType::HitStop_SyncDagger].value * 1000));
+						break;
+					case iWepType::OneH:
+						t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_1H].value * 1000),
+									   floor(ConfigManager::GetConfig()[iConfigType::HitStop_Sync1H].value * 1000));
+						break;
+					case iWepType::TwoH:
+						t = new thread(threadFunc, floor(ConfigManager::GetConfig()[iConfigType::HitStop_2H].value * 1000),
+									   floor(ConfigManager::GetConfig()[iConfigType::HitStop_Sync2H].value * 1000));
+						break;
+				}
+				HitStopThreadManager::threadQueue.push(t);
+				HitStopThreadManager::RequestLaunch();
 			}
-			HitStopThreadManager::threadQueue.push(t);
-			HitStopThreadManager::RequestLaunch();
 		}
 	}
 

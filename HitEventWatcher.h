@@ -13,6 +13,7 @@ protected:
 	static std::string className;
 	static std::list<UInt64> actors;
 	static unordered_map<TESObjectREFR*, unordered_map<TESObjectREFR*, std::chrono::system_clock::time_point>> lastHitEvent;
+	static EffectSetting* hitFeedbackMGEF;
 public:
 	HitEventWatcher() {
 		if (instance)

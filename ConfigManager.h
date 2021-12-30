@@ -90,6 +90,7 @@ enum iConfigType {
 	Dash_1H_Duration,
 	Dash_2H_Duration,
 	EnableHitStop,
+	HitStop_OnPowerAttackOnly,
 	HitStop_OnPlayerHit,
 	HitStop_OnObjectHit,
 	HitStop_Fist,

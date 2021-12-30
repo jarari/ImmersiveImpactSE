@@ -31,6 +31,7 @@ namespace Utils{
 		return olddata;
 	}
 	ActiveEffect* GetActiveEffectFromActor(Actor* actor, const char* name);
+	ActiveEffect* GetActiveEffectFromActor(Actor* actor, EffectSetting* mgef);
 	void SetMatrix33(float a, float b, float c, float d, float e, float f, float g, float h, float i, NiMatrix33& mat);
 	NiMatrix33 GetRotationMatrix33(float pitch, float yaw, float roll);
 	NiMatrix33 GetRotationMatrix33(NiPoint3 axis, float angle);

@@ -103,6 +103,8 @@ void PhysicsManager::SetDrag(Actor* a, float f) {
 *
 * bool onGround = (flag & 0x100) == 0x100;
 * bool inWater = (flag & 0xA00000) == 0xA00000;
+* 
+* See SkyrimSE.exe+0xE1E270. bhkCharacterStateSwimming makes player movable
 */
 
 float PhysicsManager::ModifyVelocity(Actor* a, hkVector4 v, bool modifyState) {

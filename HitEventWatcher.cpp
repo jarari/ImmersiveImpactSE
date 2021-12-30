@@ -7,6 +7,7 @@
 #include "Utils.h"
 #include <skse64_common\BranchTrampoline.h>
 #include <skse64_common\SafeWrite.h>
+#include <skse64\GameData.h>
 #include <skse64\GameExtraData.h>
 #include <skse64\GameMenus.h>
 #include <skse64\GameReferences.h>
@@ -17,6 +18,7 @@
 std::string HitEventWatcher::className = "HitEventWatcher";
 HitEventWatcher* HitEventWatcher::instance = nullptr;
 unordered_map<TESObjectREFR*, unordered_map<TESObjectREFR*, std::chrono::system_clock::time_point>> HitEventWatcher::lastHitEvent;
+EffectSetting* HitEventWatcher::hitFeedbackMGEF = nullptr;
 std::random_device rd;
 
 void HookDamageCalculation() {
@@ -83,6 +85,13 @@ void HitEventWatcher::InitWatcher() {
 		instance = new HitEventWatcher();
 		HookDamageCalculation();
 	}
+	DataHandler* dh = DataHandler::GetSingleton();
+	const ModInfo* iimpt = dh->LookupModByName("ImmersiveImpact.esp");
+	if (!iimpt)
+		_MESSAGE("ImmersiveImpact.esp not found!");
+	hitFeedbackMGEF = (EffectSetting*)LookupFormByID(iimpt->GetFormID(0x801));
+	if (hitFeedbackMGEF)
+		_MESSAGE("Found the Magic Effect at %llx", hitFeedbackMGEF);
 	_MESSAGE((className + std::string(" initialized.")).c_str());
 }
 
@@ -104,7 +113,7 @@ EventResult HitEventWatcher::ReceiveEvent(TESHitEvent* evn, EventDispatcher<TESH
 	if (ActorManager::IsInKillmove(attacker) || ActorManager::IsInKillmove(target) || target->IsDead(1))
 		return kEvent_Continue;
 
-	ActiveEffect* ae = Utils::GetActiveEffectFromActor(target, "BingleHitFeedback");
+	ActiveEffect* ae = Utils::GetActiveEffectFromActor(target, hitFeedbackMGEF);
 	//If the damage is done by magic
 	//If the target cannot be knock-downed.
 	if (evn->projectileFormID != 0

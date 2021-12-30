@@ -88,6 +88,7 @@ void ConfigManager::InitializeConfigDefaults() {
 	configs.push_back(Config("Dash_1H_Duration", 0.3f));
 	configs.push_back(Config("Dash_2H_Duration", 0.4f));
 	configs.push_back(Config("EnableHitStop", 0));
+	configs.push_back(Config("HitStop_OnPowerAttackOnly", 0));
 	configs.push_back(Config("HitStop_OnPlayerHit", 0));
 	configs.push_back(Config("HitStop_OnObjectHit", 0));
 	configs.push_back(Config("HitStop_Fist", 0.075f));

@@ -51,6 +51,21 @@ ActiveEffect* Utils::GetActiveEffectFromActor(Actor* actor, const char* name) {
 	return nullptr;
 }
 
+ActiveEffect* Utils::GetActiveEffectFromActor(Actor* actor, EffectSetting* mgef) {
+	tList<ActiveEffect>* list_ae = actor->magicTarget.GetActiveEffects();
+	tList<ActiveEffect>::Iterator it = list_ae->Begin();
+	if (list_ae->Count() == 0)
+		return nullptr;
+	while (!it.End()) {
+		ActiveEffect* ae = it.Get();
+		if (ae->effect->mgef == mgef) {
+			return ae;
+		}
+		++it;
+	}
+	return nullptr;
+}
+
 void Utils::SetMatrix33(float a, float b, float c, float d, float e, float f, float g, float h, float i, NiMatrix33& mat) {
 	mat.data[0][0] = a;
 	mat.data[0][1] = b;

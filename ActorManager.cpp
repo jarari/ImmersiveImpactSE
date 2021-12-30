@@ -27,7 +27,7 @@ void ActorManager::FindDeflectSound() {
 	const ModInfo* iimpt = dh->LookupModByName("ImmersiveImpact.esp");
 	if (!iimpt)
 		_MESSAGE("ImmersiveImpact.esp not found!");
-	deflectSound = (TESSound*)LookupFormByID(iimpt->GetFormID(0x00006393));
+	deflectSound = (TESSound*)LookupFormByID(iimpt->GetFormID(0x803));
 	if (deflectSound)
 		_MESSAGE("Found the sound at %llx", deflectSound);
 }
